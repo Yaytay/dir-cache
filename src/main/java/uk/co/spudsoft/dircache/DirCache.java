@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
 import uk.co.spudsoft.dircache.impl.DirCacheImpl;
 
 /**
- *
+ * A self-updating cache of the structure of files in a directory on disc.
+ * 
  * @author jtalbut
  */
 public interface DirCache extends AutoCloseable {

@@ -20,7 +20,9 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 /**
- *
+ * A Node in a DirCache representing a file on disc.
+ * It is reasonable to use File objects has Hash keys.
+ * 
  * @author jtalbut
  */
 public class File extends Node {
@@ -45,5 +47,31 @@ public class File extends Node {
   public long getSize() {
     return size;
   }
+
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    hash = 23 * hash + (int) (this.size ^ (this.size >>> 32));
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final File other = (File) obj;
+    if (this.size != other.size) {
+      return false;
+    }
+    return super.privateMembersEqual(other);
+  }
     
+  
 }

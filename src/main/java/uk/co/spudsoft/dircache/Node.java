@@ -18,12 +18,15 @@ package uk.co.spudsoft.dircache;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
+ * A Node in a DirCache representing either a file or a directory on disc.
+ * It is reasonable to use Node objects has Hash keys, but be aware that the identify of subclasses may be expensive to compute.
  *
  * @author jtalbut
  */
-public class Node {
+public abstract class Node {
   
   private final Path path;
   private final LocalDateTime modified;
@@ -41,6 +44,10 @@ public class Node {
     this.name = path.getFileName().toString();
   }
 
+  /**
+   * Get the {@link java.nio.file.Path} that relates to this Node.
+   * @return the {@link java.nio.file.Path} that relates to this Node.
+   */
   public Path getPath() {
     return path;
   }
@@ -60,5 +67,40 @@ public class Node {
   public String getName() {
     return name;
   }
+
+  @Override
+  public int hashCode() {
+    int hash = 5;
+    hash = 23 * hash + Objects.hashCode(this.path);
+    hash = 23 * hash + Objects.hashCode(this.modified);
+    hash = 23 * hash + Objects.hashCode(this.name);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Node other = (Node) obj;
+    return privateMembersEqual(other);
+  }
+
+  protected boolean privateMembersEqual(final Node other) {
+    if (!Objects.equals(this.name, other.name)) {
+      return false;
+    }
+    if (!Objects.equals(this.path, other.path)) {
+      return false;
+    }
+    return Objects.equals(this.modified, other.modified);
+  }
+  
   
 }

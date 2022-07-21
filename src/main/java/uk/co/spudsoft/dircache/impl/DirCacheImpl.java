@@ -56,6 +56,7 @@ import uk.co.spudsoft.dircache.File;
 import uk.co.spudsoft.dircache.Node;
 
 /**
+ * Default implementation of the {@link uk.co.spudsoft.dircache.DirCache} interface.
  *
  * @author jtalbut
  */

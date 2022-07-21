@@ -21,9 +21,12 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
- *
+ * A Node in a DirCache representing a directory on disc.
+ * Directory objects may be used as hash keys, but doing so requires the calculation of hash codes and equality for all children.
+ * 
  * @author jtalbut
  */
 public class Directory extends Node {
@@ -74,5 +77,31 @@ public class Directory extends Node {
       return null;
     }
   }
+
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    hash = 89 * hash + Objects.hashCode(this.children);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final Directory other = (Directory) obj;
+    if (!super.privateMembersEqual(other)) {
+      return false;
+    }
+    return Objects.equals(this.children, other.children);
+  }
+  
   
 }
