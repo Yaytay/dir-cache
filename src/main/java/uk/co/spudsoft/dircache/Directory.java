@@ -80,7 +80,7 @@ public class Directory extends Node {
 
   @Override
   public int hashCode() {
-    int hash = super.hashCode();
+    int hash = super.privateMembersHashCode();
     hash = 89 * hash + Objects.hashCode(this.children);
     return hash;
   }

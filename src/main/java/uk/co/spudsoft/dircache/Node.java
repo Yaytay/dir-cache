@@ -68,28 +68,12 @@ public abstract class Node {
     return name;
   }
 
-  @Override
-  public int hashCode() {
+  protected int privateMembersHashCode() {
     int hash = 5;
     hash = 23 * hash + Objects.hashCode(this.path);
     hash = 23 * hash + Objects.hashCode(this.modified);
     hash = 23 * hash + Objects.hashCode(this.name);
     return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final Node other = (Node) obj;
-    return privateMembersEqual(other);
   }
 
   protected boolean privateMembersEqual(final Node other) {

@@ -50,7 +50,7 @@ public class File extends Node {
 
   @Override
   public int hashCode() {
-    int hash = super.hashCode();
+    int hash = super.privateMembersHashCode();
     hash = 23 * hash + (int) (this.size ^ (this.size >>> 32));
     return hash;
   }
