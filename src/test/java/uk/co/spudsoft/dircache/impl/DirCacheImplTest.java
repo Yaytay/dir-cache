@@ -62,6 +62,12 @@ public class DirCacheImplTest {
 
     try (DirCache dirCache = DirCache.cache(root, Duration.ZERO, Pattern.compile("^uk.*"))) {
       logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
+      
+      // Dirs before files
+      assertEquals("a", dirCache.getRoot().getChildren().get(0).getName());
+      assertEquals("c", dirCache.getRoot().getChildren().get(1).getName());
+      assertEquals("b", dirCache.getRoot().getChildren().get(2).getName());
+      
       LocalDateTime firstWalkTime = dirCache.getLastWalkTime();
       assertNull(dirCache.getRoot().getDir("a").getDir("aa").get("bob"));
 
