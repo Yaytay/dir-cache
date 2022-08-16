@@ -199,6 +199,31 @@ public class DirCacheImpl implements DirCache {
       this.lastModified = lastModified;
       this.nodeList = new ArrayList<>();
     }
+    
+    void sort() {
+      nodeList.sort(DirCacheImpl::compareNodes);
+    }
+  }
+  
+  static int compareNodes(Node o1, Node o2) {
+    if (o1 == o2) {
+      return 0;
+    }
+    if (o1 instanceof Directory && o2 instanceof File) {
+      return -1;
+    } else if (o2 instanceof Directory && o1 instanceof File) {
+      return 1;
+    }
+    if (o1 == null) {
+      if (o2 != null) {
+        return -1;
+      } else {
+        return 0;
+      }
+    } else if (o2 == null) {
+      return 1;
+    } 
+    return o1.getName().compareTo(o2.getName());
   }
 
   private class Visitor implements FileVisitor<Path> {
@@ -262,6 +287,7 @@ public class DirCacheImpl implements DirCache {
       logger.trace("postVisitDirectory({}, {})", dir, exc);
       PathAndNodeList panl = dirStack.pop();
       assert (dir.equals(panl.path));
+      panl.sort();
       Directory thisDir = new Directory(dir, panl.lastModified, panl.nodeList);
       if (dirStack.isEmpty()) {
         root = thisDir;
@@ -269,7 +295,6 @@ public class DirCacheImpl implements DirCache {
         PathAndNodeList parent = dirStack.peek();
         parent.nodeList.add(thisDir);
       }
-
       return FileVisitResult.CONTINUE;
     }
   }

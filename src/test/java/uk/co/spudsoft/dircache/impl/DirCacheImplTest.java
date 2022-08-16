@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.spudsoft.dircache.DirCache;
+import uk.co.spudsoft.dircache.File;
 
 /**
  *
@@ -127,4 +128,16 @@ public class DirCacheImplTest {
     return count + 1;
   }
 
+  @Test
+  public void testComparator() {
+    File file1 = new File(Path.of("target/test-classes/a"), LocalDateTime.MIN, 0);
+    File file2 = new File(Path.of("target/test-classes/b"), LocalDateTime.MIN, 0);
+    assertEquals(0, DirCacheImpl.compareNodes(null, null));
+    assertEquals(-1, DirCacheImpl.compareNodes(null, file1));
+    assertEquals(1, DirCacheImpl.compareNodes(file1, null));
+    assertEquals(-1, DirCacheImpl.compareNodes(file1, file2));
+    assertEquals(1, DirCacheImpl.compareNodes(file2, file1));
+    assertEquals(0, DirCacheImpl.compareNodes(file1, file1));
+  }
+  
 }
