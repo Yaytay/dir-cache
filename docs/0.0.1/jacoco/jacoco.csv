@@ -1,8 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Dir Cache,uk.co.spudsoft.dircache,DirCache,0,8,0,0,0,1,0,1,0,1
-Dir Cache,uk.co.spudsoft.dircache,File,0,11,0,0,0,4,0,2,0,2
-Dir Cache,uk.co.spudsoft.dircache,Node,0,23,0,0,0,8,0,4,0,4
-Dir Cache,uk.co.spudsoft.dircache,Directory,0,54,0,2,0,11,0,6,0,5
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.Visitor,17,200,1,9,4,32,2,12,1,8
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.PathAndNodeList,0,14,0,0,0,5,0,1,0,1
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl,17,240,1,21,7,72,1,20,0,10
