@@ -302,6 +302,7 @@ public class DirCacheImpl implements DirCache {
   private void walk() {
     Visitor visitor = new Visitor();
     LocalDateTime walkTime = LocalDateTime.now();
+    logger.debug("Scanning file tree after change notification");
     synchronized (scanLock) {
       try {
         Files.walkFileTree(rootPath, EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, visitor);
