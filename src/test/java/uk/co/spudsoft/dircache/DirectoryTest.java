@@ -35,8 +35,8 @@ public class DirectoryTest {
    */
   @Test
   public void testGetChildren() {
-    Directory instance = new Directory(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), Arrays.asList());
-    List<Node> expResult = Arrays.asList();
+    DirCacheTree.Directory instance = new DirCacheTree.Directory(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), Arrays.asList());
+    List<DirCacheTree.Node> expResult = Arrays.asList();
     assertEquals(Arrays.asList(), instance.getChildren());
   }
 
@@ -46,7 +46,7 @@ public class DirectoryTest {
   @Test
   public void testGet() {
     LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
-    Directory instance = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
     assertEquals(instance.getChildren().get(0), instance.get("second"));
     assertEquals(instance.getChildren().get(1), instance.get("third"));
   }
@@ -57,7 +57,7 @@ public class DirectoryTest {
   @Test
   public void testGetDir() {
     LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
-    Directory instance = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
     assertNull(instance.getDir("second"));
   }
 
@@ -67,9 +67,9 @@ public class DirectoryTest {
   @Test
   public void testHashCode() {
     LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
-    Directory instance1 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
-    Directory instance2 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 3)));
-    Directory instance3 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance1 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 3)));
+    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
 
     assertEquals(instance1.hashCode(), instance3.hashCode());
     assertNotEquals(instance1.hashCode(), instance2.hashCode());
@@ -81,11 +81,11 @@ public class DirectoryTest {
   @Test
   public void testEquals() {
     LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
-    Directory instance1 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
-    Directory instance2 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 3)));
-    Directory instance3 = new Directory(Path.of("first"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
-    Directory instance4 = new Directory(Path.of("bob"), ts, Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
-    Directory instance5 = new Directory(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), Arrays.asList(new File(Path.of("first", "second"), ts, 1), new File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance1 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 3)));
+    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance4 = new DirCacheTree.Directory(Path.of("bob"),   ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance5 = new DirCacheTree.Directory(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
     
     assertEquals(instance1, instance1);
     assertEquals(instance1, instance3);

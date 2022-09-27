@@ -51,9 +51,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.spudsoft.dircache.DirCache;
-import uk.co.spudsoft.dircache.Directory;
-import uk.co.spudsoft.dircache.File;
-import uk.co.spudsoft.dircache.Node;
+import uk.co.spudsoft.dircache.DirCacheTree;
 
 /**
  * Default implementation of the {@link uk.co.spudsoft.dircache.DirCache} interface.
@@ -74,7 +72,7 @@ public class DirCacheImpl implements DirCache {
   private final Pattern ignore;
   private final Thread thread;
   private LocalDateTime lastWalkTime;
-  private Directory rootNode;
+  private DirCacheTree.Directory rootNode;
   
   private Runnable callback;  
 
@@ -101,7 +99,7 @@ public class DirCacheImpl implements DirCache {
   }
 
   @Override
-  public Directory getRoot() {
+  public DirCacheTree.Directory getRoot() {
     return rootNode;
   }
 
@@ -192,7 +190,7 @@ public class DirCacheImpl implements DirCache {
 
     public final Path path;
     private final LocalDateTime lastModified;
-    public final List<Node> nodeList;
+    public final List<DirCacheTree.Node> nodeList;
 
     PathAndNodeList(Path path, LocalDateTime lastModified) {
       this.path = path;
@@ -205,13 +203,13 @@ public class DirCacheImpl implements DirCache {
     }
   }
   
-  static int compareNodes(Node o1, Node o2) {
+  static int compareNodes(DirCacheTree.Node o1, DirCacheTree.Node o2) {
     if (o1 == o2) {
       return 0;
     }
-    if (o1 instanceof Directory && o2 instanceof File) {
+    if (o1 instanceof DirCacheTree.Directory && o2 instanceof DirCacheTree.File) {
       return -1;
-    } else if (o2 instanceof Directory && o1 instanceof File) {
+    } else if (o2 instanceof DirCacheTree.Directory && o1 instanceof DirCacheTree.File) {
       return 1;
     }
     if (o1 == null) {
@@ -230,9 +228,9 @@ public class DirCacheImpl implements DirCache {
 
     private final List<Path> dirsFound = new ArrayList<>();
     private final Stack<PathAndNodeList> dirStack = new Stack<>();
-    private Directory root;
+    private DirCacheTree.Directory root;
 
-    public Directory getRoot() {
+    public DirCacheTree.Directory getRoot() {
       return root;
     }
 
@@ -270,7 +268,7 @@ public class DirCacheImpl implements DirCache {
       if (!ignore.matcher(file.getFileName().toString()).matches()) {
         logger.trace("visitFile({}, {}) in {}", file, attrs.lastModifiedTime(), dirStack.peek());
         PathAndNodeList parent = dirStack.peek();
-        File thisFile = new File(file, getLastModified(attrs), attrs.size());
+        DirCacheTree.File thisFile = new DirCacheTree.File(file, getLastModified(attrs), attrs.size());
         parent.nodeList.add(thisFile);
       }
       return FileVisitResult.CONTINUE;
@@ -288,7 +286,7 @@ public class DirCacheImpl implements DirCache {
       PathAndNodeList panl = dirStack.pop();
       assert (dir.equals(panl.path));
       panl.sort();
-      Directory thisDir = new Directory(dir, panl.lastModified, panl.nodeList);
+      DirCacheTree.Directory thisDir = new DirCacheTree.Directory(dir, panl.lastModified, panl.nodeList);
       if (dirStack.isEmpty()) {
         root = thisDir;
       } else {

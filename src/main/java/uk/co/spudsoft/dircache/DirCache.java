@@ -32,6 +32,15 @@ import uk.co.spudsoft.dircache.impl.DirCacheImpl;
 public interface DirCache extends AutoCloseable {
   
   /**
+   * Override of {@link java.lang.AutoCloseable#close()} to specify that is does not throw.
+   * 
+   * Close the DirCache, freeing up resources and preventing any future use of it.
+   * 
+   */
+  @Override
+  void close();
+  
+  /**
    * Create a dir cache of a given path, monitoring for any changes that occur.
    * 
    * Note that all the Nodes of a DirCache are immutable, whenever a change occurs the cache is rebuilt from the root.
@@ -54,7 +63,7 @@ public interface DirCache extends AutoCloseable {
    * This will be the Directory object representing the original root Path.
    * @return the Directory at the root of the tree.
    */
-  Directory getRoot();
+  DirCacheTree.Directory getRoot();
   
   /**
    * Start the DirCache monitoring.

@@ -19,6 +19,7 @@ package uk.co.spudsoft.dircache.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import static com.jayway.awaitility.Awaitility.await;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.spudsoft.dircache.DirCache;
-import uk.co.spudsoft.dircache.File;
+import uk.co.spudsoft.dircache.DirCacheTree;
 
 /**
  *
@@ -121,10 +122,10 @@ public class DirCacheImplTest {
     Thread.sleep(2000);
   }
 
-  private int delete(java.io.File f) throws IOException {
+  private int delete(File f) throws IOException {
     int count = 0;
     if (f.isDirectory()) {
-      for (java.io.File c : f.listFiles()) {
+      for (File c : f.listFiles()) {
         count += delete(c);
       }
     }
@@ -136,8 +137,8 @@ public class DirCacheImplTest {
 
   @Test
   public void testComparator() {
-    File file1 = new File(Path.of("target/test-classes/a"), LocalDateTime.MIN, 0);
-    File file2 = new File(Path.of("target/test-classes/b"), LocalDateTime.MIN, 0);
+    DirCacheTree.File file1 = new DirCacheTree.File(Path.of("target/test-classes/a"), LocalDateTime.MIN, 0);
+    DirCacheTree.File file2 = new DirCacheTree.File(Path.of("target/test-classes/b"), LocalDateTime.MIN, 0);
     assertEquals(0, DirCacheImpl.compareNodes(null, null));
     assertEquals(-1, DirCacheImpl.compareNodes(null, file1));
     assertEquals(1, DirCacheImpl.compareNodes(file1, null));

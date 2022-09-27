@@ -29,37 +29,37 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileTest {
   
   /**
-   * Test of getSize method, of class File.
+   * Test of getSize method, of class DirCacheTree.File.
    */
   @Test
   public void testGetSize() {
-    File instance = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
     assertEquals(27, instance.getSize());
   }
 
   /**
-   * Test of hashCode method, of class File.
+   * Test of hashCode method, of class DirCacheTree.File.
    */
   @Test
   public void testHashCode() {
-    File instance1 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
-    File instance2 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 28);
-    File instance3 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance1 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance2 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 28);
+    DirCacheTree.File instance3 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
     
     assertEquals(instance1.hashCode(), instance3.hashCode());
     assertNotEquals(instance1.hashCode(), instance2.hashCode());
   }
 
   /**
-   * Test of equals method, of class File.
+   * Test of equals method, of class DirCacheTree.File.
    */
   @Test
   public void testEquals() {
-    File instance1 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
-    File instance2 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 28);
-    File instance3 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
-    File instance4 = new File(Path.of("second"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
-    File instance5 = new File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), 27);
+    DirCacheTree.File instance1 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance2 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 28);
+    DirCacheTree.File instance3 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance4 = new DirCacheTree.File(Path.of("second"), LocalDateTime.of(1971, Month.MAY, 06, 10, 10), 27);
+    DirCacheTree.File instance5 = new DirCacheTree.File(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), 27);
     
     assertEquals(instance1, instance1);
     assertEquals(instance1, instance3);
