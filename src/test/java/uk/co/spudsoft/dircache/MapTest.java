@@ -88,9 +88,9 @@ public class MapTest {
     
     LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
     DirCacheTree.Directory instance1 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
-    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 3)));
-    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(Path.of("first"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
-    DirCacheTree.Directory instance4 = new DirCacheTree.Directory(Path.of("bob"),   ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(Path.of("second"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 3)));
+    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(Path.of("third"), ts, Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
+    DirCacheTree.File instance4 = new DirCacheTree.File(Path.of("fourth"), ts, 1);
     DirCacheTree.Directory instance5 = new DirCacheTree.Directory(Path.of("first"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), Arrays.asList(new DirCacheTree.File(Path.of("first", "second"), ts, 1), new DirCacheTree.File(Path.of("first", "third"), ts, 2)));
 
     DirCacheTree.Directory root = new DirCacheTree.Directory(Path.of(""), ts, Arrays.asList(instance1, instance2, instance3, instance4, instance5));
@@ -106,7 +106,13 @@ public class MapTest {
     );
     
     logger.debug("DirCacheTree: {}", root);
-    logger.debug("DirCacheTree: {}", root);
+    for (DirCacheTree.Node node : root.children) {
+      logger.debug("DirCacheTree.Node: {}", node);
+    }
+    logger.debug("SimpleDirTree: {}", simpleRoot);
+    for (SimpleDirTree.SimpleNode node : simpleRoot.children) {
+      logger.debug("SimpleDirTree.Node: {}", node);
+    }
     
     
   }

@@ -36,8 +36,8 @@ public class DirCacheTree extends AbstractTree {
   }
   
   public static class Node extends AbstractNode<Node> {
-    private final Path path;
-    private final LocalDateTime modified;
+    protected final Path path;
+    protected final LocalDateTime modified;
 
     public Node(Path path, LocalDateTime modified) {
       super(path.getFileName().toString());
@@ -191,6 +191,12 @@ public class DirCacheTree extends AbstractTree {
       return Objects.equals(this.children, other.children);
     }
     
+
+    @Override
+    public String toString() {
+      return path + " (" + children.size() + " children @ " + modified + ')';
+    }
+    
   }
   
   public static class File extends Node {
@@ -241,7 +247,11 @@ public class DirCacheTree extends AbstractTree {
       return super.privateMembersEqual(other);
     }
 
-    
+    @Override
+    public String toString() {
+      return path + " (" + size + " bytes @ " + modified + ')';
+    }
+
   }
   
 }
