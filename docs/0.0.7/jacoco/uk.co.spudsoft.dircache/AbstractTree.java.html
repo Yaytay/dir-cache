@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Dir Cache</a> &gt; <a href="index.source.html" class="el_package">uk.co.spudsoft.dircache</a> &gt; <span class="el_source">AbstractTree.java</span></div><h1>AbstractTree.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2022 jtalbut
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ */
+package uk.co.spudsoft.dircache;
+
+import java.util.List;
+
+/**
+ * A generic implementation of a Tree structure.
+ * 
+ * The intention is for this class to be used for modelling directories and files,
+ * as such it would be best if this class to separated the structures for leaf nodes and internal nodes, 
+ * but that would make it impossible for subclasses to provide their own base Node class 
+ * (it would require inheritance from both the AbstractNode and the AbstractInternalNode).
+ * The result is that AbstractNode is used for both Leaf and Internal nodes and thus it is possible for a 
+ * node to have the structure of both a leaf node and an internal node.
+ * It is the responsibility of subclasses to enforce the correct distinction - a subclass used for internal nodes should call the constructor
+ * that accepts children (with a non-null children) and the a subclass used for leaf nodes should call the constructor that does
+ * not accept children.
+ * 
+ * @author jtalbut
+ */
+<span class="fc" id="L36">public abstract class AbstractTree {</span>
+
+  /**
+   * Every node in the tree is an AbstractNode.
+   * @param &lt;N&gt; The derived Node type to be used in the specific implementation.
+   */
+<span class="fc" id="L42">  public abstract static class AbstractNode&lt;N extends AbstractNode&lt;?&gt;&gt; {</span>
+    protected final String name;
+    protected final List&lt;N&gt; children;
+
+    /**
+     * Constructor.
+     * 
+     * @param name The name of the node.
+     * @param children The child nodes.
+     * All nodes have a name and all nodes except the root node should have a non-zero length name.
+     * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
+     */
+<span class="fc" id="L54">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">      assert name != null;</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      assert children != null;</span>
+<span class="fc" id="L57">      this.name = name;</span>
+<span class="fc" id="L58">      this.children = children;</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Constructor.
+     * 
+     * @param name The name of the node.
+     * All nodes have a name and all nodes except the root node should have a non-zero length name.
+     */
+<span class="fc" id="L67">    public AbstractNode(String name) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      assert name != null;</span>
+<span class="fc" id="L69">      this.name = name;</span>
+<span class="fc" id="L70">      this.children = null;</span>
+<span class="fc" id="L71">    }</span>
+
+    /**
+     * Get the name of the directory entry.
+     * @return the name of the directory entry.
+     */
+    public String getName() {
+<span class="fc" id="L78">      return name;</span>
+    }
+
+    /**
+     * Get the children of this internal node.
+     * @return the children of this internal node.
+     */
+    public List&lt;N&gt; getChildren() {
+<span class="fc" id="L86">      return children;</span>
+    }
+    
+    public boolean isLeaf() {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">      return children == null;</span>
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
