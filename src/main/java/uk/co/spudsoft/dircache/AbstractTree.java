@@ -21,9 +21,15 @@ import java.util.List;
 /**
  * A generic implementation of a Tree structure.
  * 
- * Leaf nodes should subclass AbstractNode, Internal Nodes should implement InternalNode.
- * This class unashamedly distinguishes between leaf nodes and internal nodes because it is intended
- * to map to a file structure where a file cannot be both a plain file and a directory.
+ * The intention is for this class to be used for modelling directories and files,
+ * as such it would be best if this class to separated the structures for leaf nodes and internal nodes, 
+ * but that would make it impossible for subclasses to provide their own base Node class 
+ * (it would require inheritance from both the AbstractNode and the AbstractInternalNode).
+ * The result is that AbstractNode is used for both Leaf and Internal nodes and thus it is possible for a 
+ * node to have the structure of both a leaf node and an internal node.
+ * It is the responsibility of subclasses to enforce the correct distinction - a subclass used for internal nodes should call the constructor
+ * that accepts children (with a non-null children) and the a subclass used for leaf nodes should call the constructor that does
+ * not accept children.
  * 
  * @author jtalbut
  */
@@ -47,6 +53,7 @@ public abstract class AbstractTree {
      */
     public AbstractNode(String name, List<N> children) {
       assert name != null;
+      assert children != null;
       this.name = name;
       this.children = children;
     }
