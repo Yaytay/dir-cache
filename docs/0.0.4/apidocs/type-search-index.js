@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"uk.co.spudsoft.dircache","l":"DirCache"},{"p":"uk.co.spudsoft.dircache.impl","l":"DirCacheImpl"},{"p":"uk.co.spudsoft.dircache","l":"Directory"},{"p":"uk.co.spudsoft.dircache","l":"File"},{"p":"uk.co.spudsoft.dircache","l":"Node"}];updateSearchResults();
