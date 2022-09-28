@@ -18,6 +18,7 @@ package uk.co.spudsoft.dircache;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +143,9 @@ public class DirCacheTree extends AbstractTree {
     /**
      * Map this Directory and all its children (recursively) into a different subclass of {@link AbstractTree}.
      * 
+     * Either of the mapping methods may return null, which will not be included in the output structure.
+     * This is the recommended approach if empty Directories are to be trimmed from the output.
+     * 
      * @param <O> The type of the target AbstractTree.
      * @param <N> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
      * @param <D> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
@@ -161,9 +165,39 @@ public class DirCacheTree extends AbstractTree {
                   Directory d = (Directory) n;
                   return d.map(dirMapper, fileMapper);
                 }
-              }).collect(Collectors.toList());
+              })
+              .filter(n -> n != null)
+              .collect(Collectors.toList());
       
       return dirMapper.apply(this, mappedChildren);
+    }
+    
+    private <F> void flatten(List<F> mapped, Function<File, F> mapper) {
+      children.forEach(n -> {
+        if (n instanceof File) {
+          File f = (File) n;
+          F mappedFile = mapper.apply(f);
+          if (mappedFile != null) {
+            mapped.add(mappedFile);
+          }
+        } else {
+          Directory d = (Directory) n;
+          d.flatten(mapped, mapper);
+        }
+      });
+    }
+    
+    /**
+     * Map all the Files in this Directory and all its children (recursively) into a List of individually mapped items.
+     * 
+     * @param <F> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
+     * @param fileMapper Method for mapping a File to a mapped File.
+     * @return The result of called dirMapper on this Directory with all of its children mapped.
+     */
+    public <F> List<F> flatten(Function<File, F> fileMapper) {
+      List<F> mappedChildren = new ArrayList<>();
+      Directory.this.flatten(mappedChildren, fileMapper);
+      return mappedChildren;
     }
     
     @Override
