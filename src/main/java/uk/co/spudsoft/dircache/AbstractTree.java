@@ -86,7 +86,14 @@ public abstract class AbstractTree {
       return children;
     }
     
-    public boolean isLeaf() {
+    /**
+     * Return true if the node is a leaf node (has no children).
+     * 
+     * Note that the rather clunky name is to avoid serializers considering this to be a property.
+     * 
+     * @return true if the node is a leaf node (has no children). 
+     */
+    public boolean leaf() {
       return children == null;
     }
   }

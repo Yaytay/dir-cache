@@ -148,7 +148,7 @@ public class DirCacheTree extends AbstractTree {
      * 
      * @param <O> The type of the target AbstractTree.
      * @param <N> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
-     * @param <D> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
+     * @param <D> The subtype of AbstractTree.AbstractNode used for internal nodes (directories) in the mapped tree.
      * @param dirMapper Method for mapping a Directory and it's already mapped children to a mapped Directory.
      * @param fileMapper Method for mapping a File to a mapped File.
      * @return The result of called dirMapper on this Directory with all of its children mapped.

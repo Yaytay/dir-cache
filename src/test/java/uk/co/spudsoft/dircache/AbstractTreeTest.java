@@ -16,6 +16,8 @@
  */
 package uk.co.spudsoft.dircache;
 
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,10 +29,14 @@ public class AbstractTreeTest {
   
   private static class TestTree extends AbstractTree {
     
-    private static class Node extends AbstractTree.AbstractNode {
+    private static class Node extends AbstractTree.AbstractNode<Node> {
 
       public Node(String name) {
         super(name);
+      }
+
+      public Node(String name, List<Node> children) {
+        super(name, children);
       }
       
     }
@@ -48,6 +54,22 @@ public class AbstractTreeTest {
     assertThrows(AssertionError.class, () -> {
       new TestTree.Node(null);
     });
+    assertThrows(AssertionError.class, () -> {
+      new TestTree.Node(null, null);
+    });
+    assertThrows(AssertionError.class, () -> {
+      new TestTree.Node("childless", null);
+    });
+  }
+  
+  @Test
+  public void testLeaf() {
+    
+    TestTree.Node file = new TestTree.Node("file");
+    assertTrue(file.leaf());
+    TestTree.Node dir = new TestTree.Node("file", Arrays.asList());
+    assertFalse(dir.leaf());
+    
   }
   
 }
