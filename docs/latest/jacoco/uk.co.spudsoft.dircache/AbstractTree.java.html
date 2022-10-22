@@ -52,8 +52,8 @@ import java.util.List;
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
      */
 <span class="fc" id="L54">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
-<span class="pc bpc" id="L55" title="1 of 2 branches missed.">      assert name != null;</span>
-<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      assert children != null;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">      assert name != null;</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">      assert children != null;</span>
 <span class="fc" id="L57">      this.name = name;</span>
 <span class="fc" id="L58">      this.children = children;</span>
 <span class="fc" id="L59">    }</span>
@@ -86,8 +86,15 @@ import java.util.List;
 <span class="fc" id="L86">      return children;</span>
     }
     
-    public boolean isLeaf() {
-<span class="fc bfc" id="L90" title="All 2 branches covered.">      return children == null;</span>
+    /**
+     * Return true if the node is a leaf node (has no children).
+     * 
+     * Note that the rather clunky name is to avoid serializers considering this to be a property.
+     * 
+     * @return true if the node is a leaf node (has no children). 
+     */
+    public boolean leaf() {
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      return children == null;</span>
     }
   }
 
