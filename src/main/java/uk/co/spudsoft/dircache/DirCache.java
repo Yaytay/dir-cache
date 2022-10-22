@@ -95,4 +95,10 @@ public interface DirCache extends AutoCloseable {
    */
   LocalDateTime getLastWalkTime();
 
+  /**
+   * Perform a synchronous refresh of the view of the filesystem.
+   * This should be used sparingly, it's intended for use when a client has made a specific change the filesystem that we know needs to be picked up.
+   */
+  void refresh();
+  
 }

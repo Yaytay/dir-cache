@@ -297,6 +297,11 @@ public class DirCacheImpl implements DirCache {
     }
   }
 
+  @Override
+  public void refresh() {
+    walk();
+  }
+  
   private void walk() {
     Visitor visitor = new Visitor();
     LocalDateTime walkTime = LocalDateTime.now();
