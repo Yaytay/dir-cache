@@ -64,13 +64,13 @@ public class DirCacheImpl implements DirCache {
 
   private final Object readLock = new Object();
   private final Object scanLock = new Object();
-  private final WatchService watcher = FileSystems.getDefault().newWatchService();
   private final Map<Path, WatchKey> watches = new HashMap<>();
   private final AtomicBoolean stopped = new AtomicBoolean(false);
   private final Path rootPath;
   private final long stabilizationgLagMillis;
   private final Pattern ignore;
-  private final Thread thread;
+  private Thread thread;
+  private WatchService watcher;
   private LocalDateTime lastWalkTime;
   private DirCacheTree.Directory rootNode;
   
@@ -94,8 +94,6 @@ public class DirCacheImpl implements DirCache {
     this.rootPath = root;
     this.stabilizationgLagMillis = stabilizationgLag.toMillis();
     this.ignore = ignore;
-    walk();
-    thread = new Thread(this::thread, "DirCache: " + root.toString());
   }
 
   @Override
@@ -104,7 +102,12 @@ public class DirCacheImpl implements DirCache {
   }
 
   @Override
-  public DirCacheImpl start() {
+  public DirCacheImpl start() throws IOException {
+    logger.info("Starting DirCache of {}", rootPath);
+    stopped.set(false);
+    watcher = FileSystems.getDefault().newWatchService();
+    walk();
+    thread = new Thread(this::thread, "DirCache: " + rootPath.toString());    
     thread.start();
     return this;
   }
@@ -117,6 +120,13 @@ public class DirCacheImpl implements DirCache {
     } catch (IOException ex) {
       logger.info("Failed to close dir cache file watcher: ", ex);
     }
+    try {
+      thread.join();
+    } catch (InterruptedException ex) {
+      logger.info("Interrupted whilst waiting for thread to stop");
+    }
+    watcher = null;
+    watches.clear();
     return this;
   }
 

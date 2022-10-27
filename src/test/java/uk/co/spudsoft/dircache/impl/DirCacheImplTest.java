@@ -87,6 +87,33 @@ public class DirCacheImplTest {
   }
 
   @Test
+  public void testStopStart() throws Exception {
+    Path root = Path.of("target/test-classes");
+
+    try (DirCache dirCache = DirCache.cache(root, Duration.ZERO, Pattern.compile("^uk.*"))) {
+      logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
+      
+      dirCache.stop();
+      dirCache.start();
+      
+      LocalDateTime firstWalkTime = dirCache.getLastWalkTime();
+      assertNull(dirCache.getRoot().getDir("a").getDir("aa").get("stopStart"));
+
+      Files.createFile(Path.of("target/test-classes/a/aa/stopStart"));
+      await().atMost(5, SECONDS).until(() -> firstWalkTime.isBefore(dirCache.getLastWalkTime()));
+      logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
+      assertNotNull(dirCache.getRoot().getDir("a").getDir("aa").get("stopStart"));
+      LocalDateTime secondWalkTime = dirCache.getLastWalkTime();
+
+      Files.delete(Path.of("target/test-classes/a/aa/stopStart"));
+      await().atMost(5, SECONDS).until(() -> secondWalkTime.isBefore(dirCache.getLastWalkTime()));
+      logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
+      assertNull(dirCache.getRoot().getDir("a").getDir("aa").get("stopStart"));
+      LocalDateTime thirdWalkTime = dirCache.getLastWalkTime();
+    } 
+  }
+
+  @Test
   public void testChangesWithCallback() throws Exception {
     Path root = Path.of("target/test-classes");
     AtomicInteger counter = new AtomicInteger();

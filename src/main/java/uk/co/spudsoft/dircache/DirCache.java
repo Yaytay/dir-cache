@@ -69,12 +69,16 @@ public interface DirCache extends AutoCloseable {
    * Start the DirCache monitoring.
    * This does not usually need to be called as the factory method does it.
    * @return this, so that the call may be fluent.
+   * @throws IOException if the watch service cannot be started.
    */
-  DirCache start();
+  DirCache start() throws IOException;
   
   /**
    * Stop the DirCache monitoring.
-   * Once stop has been called the DirCache cannot be restarted, create a new one.
+   * 
+   * It is permitted to stop and restart the cache
+   * , this will inherently refresh the view of the filesystem so do not call refresh after restarting.
+   * 
    * @return this, so that the call may be fluent.
    */
   DirCache stop();
