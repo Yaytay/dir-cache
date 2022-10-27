@@ -5,6 +5,6 @@ Dir Cache,uk.co.spudsoft.dircache,DirCache,0,8,0,0,0,1,0,1,0,1
 Dir Cache,uk.co.spudsoft.dircache,AbstractTree,0,3,0,0,0,1,0,1,0,1
 Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.File,0,68,0,8,0,18,0,9,0,5
 Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.Directory,1,190,2,16,0,47,2,21,0,14
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.Visitor,17,202,1,9,4,33,2,12,1,8
+Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.Visitor,10,209,1,9,2,35,1,13,0,9
 Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.PathAndNodeList,0,19,0,0,0,7,0,2,0,2
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl,29,273,3,35,12,83,4,27,1,11
+Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl,26,300,2,36,12,91,3,28,1,11
