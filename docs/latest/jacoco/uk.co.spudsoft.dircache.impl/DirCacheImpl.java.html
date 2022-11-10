@@ -286,8 +286,8 @@ public class DirCacheImpl implements DirCache {
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-<span class="fc" id="L289">      logger.trace(&quot;visitFileFailed({}, {})&quot;, file, exc);</span>
-<span class="fc" id="L290">      return FileVisitResult.CONTINUE;</span>
+<span class="nc" id="L289">      logger.trace(&quot;visitFileFailed({}, {})&quot;, file, exc);</span>
+<span class="nc" id="L290">      return FileVisitResult.CONTINUE;</span>
     }
 
     @Override
@@ -331,9 +331,9 @@ public class DirCacheImpl implements DirCache {
 <span class="fc" id="L331">      Set&lt;Path&gt; dirsFound = new HashSet&lt;&gt;(visitor.getDirsFound());</span>
 <span class="fc bfc" id="L332" title="All 2 branches covered.">      for (Iterator&lt;Entry&lt;Path, WatchKey&gt;&gt; iter = watches.entrySet().iterator(); iter.hasNext();) {</span>
 <span class="fc" id="L333">        Entry&lt;Path, WatchKey&gt; watching = iter.next();</span>
-<span class="fc bfc" id="L334" title="All 2 branches covered.">        if (!dirsFound.contains(watching.getKey())) {</span>
-<span class="fc" id="L335">          logger.trace(&quot;Path {} no longer exists and is being removed from watches&quot;, watching.getKey());</span>
-<span class="fc" id="L336">          iter.remove();</span>
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">        if (!dirsFound.contains(watching.getKey())) {</span>
+<span class="nc" id="L335">          logger.trace(&quot;Path {} no longer exists and is being removed from watches&quot;, watching.getKey());</span>
+<span class="nc" id="L336">          iter.remove();</span>
         }
 <span class="fc" id="L338">      }</span>
 <span class="fc" id="L339">    }</span>
