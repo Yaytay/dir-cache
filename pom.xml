@@ -116,7 +116,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.1.1</version>
+      <version>5.3.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -203,7 +203,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <phase>initialize</phase>
@@ -279,7 +279,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.0</version>
         <configuration>
           <configLocation>${basedir}/checkstyle.xml</configLocation>
           <encoding>UTF-8</encoding>
@@ -300,7 +300,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>10.6.0</version>
+            <version>10.12.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -308,7 +308,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M8</version>
+        <version>3.1.0</version>
         <configuration>
           <forkCount>${forkCount}</forkCount>
           <reuseForks>true</reuseForks>
@@ -326,7 +326,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M8</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <goals>
@@ -353,7 +353,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.8</version>
+        <version>0.8.10</version>
         <configuration>
           <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
           <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
@@ -502,13 +502,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.4.2</version>
+        <version>3.4.3</version>
       </plugin>
       
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
       </plugin>      
 
     </plugins>
@@ -519,7 +519,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.8</version>
+        <version>0.8.10</version>
         <reportSets>
           <reportSet>
             <reports>
@@ -586,7 +586,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
