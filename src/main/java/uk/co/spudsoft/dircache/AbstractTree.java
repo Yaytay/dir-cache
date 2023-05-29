@@ -45,28 +45,27 @@ public abstract class AbstractTree implements FileTree {
     protected final List<N> children;
 
     /**
-     * Constructor.
+     * Internal node constructor.
      * 
-     * @param name The name of the node.
+     * @param name The name of the node.  The name of a leaf node may not be empty.
      * @param children The child nodes.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
      */
-    public AbstractNode(String name, List<N> children) {
+    public AbstractNode(@NotNull String name, @NotNull List<N> children) {
       assert name != null;
-      assert name.length() > 0;
       assert children != null;
       this.name = name;
       this.children = children;
     }
 
     /**
-     * Constructor.
+     * Leaf node constructor.
      * 
-     * @param name The name of the node.
+     * @param name The name of the node.  The name of a leaf node may not be empty.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      */
-    public AbstractNode(String name) {
+    public AbstractNode(@NotNull String name) {
       assert name != null;
       assert name.length() > 0;
       this.name = name;
