@@ -45,33 +45,32 @@ import java.util.List;
     protected final List&lt;N&gt; children;
 
     /**
-     * Constructor.
+     * Internal node constructor.
      * 
-     * @param name The name of the node.
+     * @param name The name of the node.  The name of a leaf node may not be empty.
      * @param children The child nodes.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
      */
-<span class="fc" id="L55">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
+<span class="fc" id="L55">    public AbstractNode(@NotNull String name, @NotNull List&lt;N&gt; children) {</span>
 <span class="fc bfc" id="L56" title="All 2 branches covered.">      assert name != null;</span>
-<span class="pc bpc" id="L57" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
-<span class="fc bfc" id="L58" title="All 2 branches covered.">      assert children != null;</span>
-<span class="fc" id="L59">      this.name = name;</span>
-<span class="fc" id="L60">      this.children = children;</span>
-<span class="fc" id="L61">    }</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">      assert children != null;</span>
+<span class="fc" id="L58">      this.name = name;</span>
+<span class="fc" id="L59">      this.children = children;</span>
+<span class="fc" id="L60">    }</span>
 
     /**
-     * Constructor.
+     * Leaf node constructor.
      * 
-     * @param name The name of the node.
+     * @param name The name of the node.  The name of a leaf node may not be empty.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      */
-<span class="fc" id="L69">    public AbstractNode(String name) {</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">      assert name != null;</span>
-<span class="pc bpc" id="L71" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
-<span class="fc" id="L72">      this.name = name;</span>
-<span class="fc" id="L73">      this.children = null;</span>
-<span class="fc" id="L74">    }</span>
+<span class="fc" id="L68">    public AbstractNode(@NotNull String name) {</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">      assert name != null;</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
+<span class="fc" id="L71">      this.name = name;</span>
+<span class="fc" id="L72">      this.children = null;</span>
+<span class="fc" id="L73">    }</span>
 
     /**
      * Get the name of the directory entry.
@@ -80,7 +79,7 @@ import java.util.List;
     @Override
     @NotNull
     public String getName() {
-<span class="fc" id="L83">      return name;</span>
+<span class="fc" id="L82">      return name;</span>
     }
 
     /**
@@ -89,7 +88,7 @@ import java.util.List;
      */
     @Override
     public List&lt;N&gt; getChildren() {
-<span class="fc" id="L92">      return children;</span>
+<span class="fc" id="L91">      return children;</span>
     }
     
     /**
@@ -101,7 +100,7 @@ import java.util.List;
      */
     @Override
     public boolean leaf() {
-<span class="fc bfc" id="L104" title="All 2 branches covered.">      return children == null;</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">      return children == null;</span>
     }
   }
 
