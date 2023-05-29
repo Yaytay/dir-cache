@@ -17,6 +17,7 @@
 package uk.co.spudsoft.dircache;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * A generic implementation of a Tree structure.
@@ -33,13 +34,13 @@ import java.util.List;
  * 
  * @author jtalbut
  */
-<span class="fc" id="L36">public abstract class AbstractTree {</span>
+<span class="fc" id="L37">public abstract class AbstractTree implements FileTree {</span>
 
   /**
    * Every node in the tree is an AbstractNode.
    * @param &lt;N&gt; The derived Node type to be used in the specific implementation.
    */
-<span class="fc" id="L42">  public abstract static class AbstractNode&lt;N extends AbstractNode&lt;?&gt;&gt; {</span>
+<span class="fc" id="L43">  public abstract static class AbstractNode&lt;N extends AbstractNode&lt;?&gt;&gt; implements FileTree.FileTreeNode&lt;N&gt; {</span>
     protected final String name;
     protected final List&lt;N&gt; children;
 
@@ -51,12 +52,12 @@ import java.util.List;
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
      */
-<span class="fc" id="L54">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
-<span class="fc bfc" id="L55" title="All 2 branches covered.">      assert name != null;</span>
-<span class="fc bfc" id="L56" title="All 2 branches covered.">      assert children != null;</span>
-<span class="fc" id="L57">      this.name = name;</span>
-<span class="fc" id="L58">      this.children = children;</span>
-<span class="fc" id="L59">    }</span>
+<span class="fc" id="L55">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">      assert name != null;</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">      assert children != null;</span>
+<span class="fc" id="L58">      this.name = name;</span>
+<span class="fc" id="L59">      this.children = children;</span>
+<span class="fc" id="L60">    }</span>
 
     /**
      * Constructor.
@@ -64,26 +65,29 @@ import java.util.List;
      * @param name The name of the node.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      */
-<span class="fc" id="L67">    public AbstractNode(String name) {</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">      assert name != null;</span>
-<span class="fc" id="L69">      this.name = name;</span>
-<span class="fc" id="L70">      this.children = null;</span>
-<span class="fc" id="L71">    }</span>
+<span class="fc" id="L68">    public AbstractNode(String name) {</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">      assert name != null;</span>
+<span class="fc" id="L70">      this.name = name;</span>
+<span class="fc" id="L71">      this.children = null;</span>
+<span class="fc" id="L72">    }</span>
 
     /**
      * Get the name of the directory entry.
      * @return the name of the directory entry.
      */
+    @Override
+    @Nonnull
     public String getName() {
-<span class="fc" id="L78">      return name;</span>
+<span class="fc" id="L81">      return name;</span>
     }
 
     /**
      * Get the children of this internal node.
      * @return the children of this internal node.
      */
+    @Override
     public List&lt;N&gt; getChildren() {
-<span class="fc" id="L86">      return children;</span>
+<span class="fc" id="L90">      return children;</span>
     }
     
     /**
@@ -93,8 +97,9 @@ import java.util.List;
      * 
      * @return true if the node is a leaf node (has no children). 
      */
+    @Override
     public boolean leaf() {
-<span class="fc bfc" id="L97" title="All 2 branches covered.">      return children == null;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">      return children == null;</span>
     }
   }
 
