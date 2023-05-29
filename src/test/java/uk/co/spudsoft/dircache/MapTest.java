@@ -94,7 +94,7 @@ public class MapTest {
     DirCacheTree.File instance4 = new DirCacheTree.File(Path.of("fourth"), ts, 1);
     DirCacheTree.Directory instance5 = new DirCacheTree.Directory(Path.of("fifthDir"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), Arrays.asList(new DirCacheTree.File(Path.of("fifthDir", "fifthFirstFile"), ts, 1), new DirCacheTree.File(Path.of("fifthDir", "fifthSecondFile"), ts, 2)));
 
-    DirCacheTree.Directory root = new DirCacheTree.Directory(Path.of(""), ts, Arrays.asList(instance1, instance2, instance3, instance4, instance5));
+    DirCacheTree.Directory root = new DirCacheTree.Directory(Path.of("."), ts, Arrays.asList(instance1, instance2, instance3, instance4, instance5));
     
     SimpleDirTree.SimpleDirectory simpleRoot = root.<SimpleDirTree, SimpleDirTree.SimpleNode, SimpleDirTree.SimpleDirectory>map(
             (d, l) -> {
