@@ -16,8 +16,8 @@
  */
 package uk.co.spudsoft.dircache;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 /**
  * A generic implementation of a Tree structure.
@@ -54,6 +54,7 @@ public abstract class AbstractTree implements FileTree {
      */
     public AbstractNode(String name, List<N> children) {
       assert name != null;
+      assert name.length() > 0;
       assert children != null;
       this.name = name;
       this.children = children;
@@ -67,6 +68,7 @@ public abstract class AbstractTree implements FileTree {
      */
     public AbstractNode(String name) {
       assert name != null;
+      assert name.length() > 0;
       this.name = name;
       this.children = null;
     }
@@ -76,7 +78,7 @@ public abstract class AbstractTree implements FileTree {
      * @return the name of the directory entry.
      */
     @Override
-    @Nonnull
+    @NotNull
     public String getName() {
       return name;
     }

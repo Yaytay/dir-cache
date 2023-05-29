@@ -6,7 +6,7 @@
 [![Build Status](https://github.com/yaytay/dir-cache/actions/workflows/buildtest.yml/badge.svg)](https://github.com/Yaytay/dir-cache/actions/workflows/buildtest.yml)
 [![CodeCov](https://codecov.io/gh/Yaytay/dir-cache/branch/main/graph/badge.svg?token=ACHVK20T9Q)](https://codecov.io/gh/Yaytay/dir-cache)
 
-The dir-cache is a minimal jar (the only runtime dependency is slf4j, with a 'provided' scope dependency on jsr305) to provide an in-memory model of a directory tree on disc.
+The dir-cache is a minimal jar (the only runtime dependency is slf4j, with a 'provided' scope dependency on jakarta.validation-api) to provide an in-memory model of a directory tree on disc.
 Any changes to the directory tree on disc will be picked up in the in-memory model quickly.
 
 When files are written to disc this usually results in multiple notifications to a WatchService, the DirCache delays responding to 
