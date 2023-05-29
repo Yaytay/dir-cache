@@ -74,6 +74,7 @@ public abstract class AbstractTree implements FileTree {
      * Get the name of the directory entry.
      * @return the name of the directory entry.
      */
+    @Override
     public String getName() {
       return name;
     }
@@ -82,6 +83,7 @@ public abstract class AbstractTree implements FileTree {
      * Get the children of this internal node.
      * @return the children of this internal node.
      */
+    @Override
     public List<N> getChildren() {
       return children;
     }
@@ -93,6 +95,7 @@ public abstract class AbstractTree implements FileTree {
      * 
      * @return true if the node is a leaf node (has no children). 
      */
+    @Override
     public boolean leaf() {
       return children == null;
     }

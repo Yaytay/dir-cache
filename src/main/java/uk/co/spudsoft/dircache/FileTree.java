@@ -17,6 +17,7 @@
 package uk.co.spudsoft.dircache;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  *
@@ -30,6 +31,7 @@ public interface FileTree {
      * Get the name of the directory entry.
      * @return the name of the directory entry.
      */
+    @Nonnull
     String getName();
 
     /**
