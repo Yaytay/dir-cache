@@ -33,13 +33,13 @@ import java.util.List;
  * 
  * @author jtalbut
  */
-public abstract class AbstractTree {
+public abstract class AbstractTree implements FileTree {
 
   /**
    * Every node in the tree is an AbstractNode.
    * @param <N> The derived Node type to be used in the specific implementation.
    */
-  public abstract static class AbstractNode<N extends AbstractNode<?>> {
+  public abstract static class AbstractNode<N extends AbstractNode<?>> implements FileTree.FileTreeNode<N> {
     protected final String name;
     protected final List<N> children;
 
