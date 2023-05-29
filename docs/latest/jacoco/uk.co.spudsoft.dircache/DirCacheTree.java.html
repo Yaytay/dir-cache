@@ -16,6 +16,7 @@
  */
 package uk.co.spudsoft.dircache;
 
+import jakarta.validation.constraints.NotNull;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 /**
  *
@@ -114,7 +114,7 @@ public class DirCacheTree extends AbstractTree {
      * @return the children of the Directory.
      */
     @Override
-    @Nonnull
+    @NotNull
     public List&lt;Node&gt; getChildren() {
 <span class="fc" id="L119">      return children;</span>
     }

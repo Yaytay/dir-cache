@@ -1,5 +1,5 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Dir Cache,uk.co.spudsoft.dircache,AbstractTree.AbstractNode,0,53,0,8,0,15,0,10,0,6
+Dir Cache,uk.co.spudsoft.dircache,AbstractTree.AbstractNode,8,61,2,10,0,17,2,10,0,6
 Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.Node,2,95,1,5,1,22,1,8,0,6
 Dir Cache,uk.co.spudsoft.dircache,DirCache,0,8,0,0,0,1,0,1,0,1
 Dir Cache,uk.co.spudsoft.dircache,AbstractTree,0,3,0,0,0,1,0,1,0,1

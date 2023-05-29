@@ -16,8 +16,8 @@
  */
 package uk.co.spudsoft.dircache;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 /**
  * A generic implementation of a Tree structure.
@@ -54,10 +54,11 @@ import javax.annotation.Nonnull;
      */
 <span class="fc" id="L55">    public AbstractNode(String name, List&lt;N&gt; children) {</span>
 <span class="fc bfc" id="L56" title="All 2 branches covered.">      assert name != null;</span>
-<span class="fc bfc" id="L57" title="All 2 branches covered.">      assert children != null;</span>
-<span class="fc" id="L58">      this.name = name;</span>
-<span class="fc" id="L59">      this.children = children;</span>
-<span class="fc" id="L60">    }</span>
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      assert children != null;</span>
+<span class="fc" id="L59">      this.name = name;</span>
+<span class="fc" id="L60">      this.children = children;</span>
+<span class="fc" id="L61">    }</span>
 
     /**
      * Constructor.
@@ -65,20 +66,21 @@ import javax.annotation.Nonnull;
      * @param name The name of the node.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      */
-<span class="fc" id="L68">    public AbstractNode(String name) {</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">      assert name != null;</span>
-<span class="fc" id="L70">      this.name = name;</span>
-<span class="fc" id="L71">      this.children = null;</span>
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L69">    public AbstractNode(String name) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      assert name != null;</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
+<span class="fc" id="L72">      this.name = name;</span>
+<span class="fc" id="L73">      this.children = null;</span>
+<span class="fc" id="L74">    }</span>
 
     /**
      * Get the name of the directory entry.
      * @return the name of the directory entry.
      */
     @Override
-    @Nonnull
+    @NotNull
     public String getName() {
-<span class="fc" id="L81">      return name;</span>
+<span class="fc" id="L83">      return name;</span>
     }
 
     /**
@@ -87,7 +89,7 @@ import javax.annotation.Nonnull;
      */
     @Override
     public List&lt;N&gt; getChildren() {
-<span class="fc" id="L90">      return children;</span>
+<span class="fc" id="L92">      return children;</span>
     }
     
     /**
@@ -99,7 +101,7 @@ import javax.annotation.Nonnull;
      */
     @Override
     public boolean leaf() {
-<span class="fc bfc" id="L102" title="All 2 branches covered.">      return children == null;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">      return children == null;</span>
     }
   }
 
