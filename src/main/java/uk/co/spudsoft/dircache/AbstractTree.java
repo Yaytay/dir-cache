@@ -17,6 +17,7 @@
 package uk.co.spudsoft.dircache;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 
 /**
  * A generic implementation of a Tree structure.
@@ -75,6 +76,7 @@ public abstract class AbstractTree implements FileTree {
      * @return the name of the directory entry.
      */
     @Override
+    @Nonnull
     public String getName() {
       return name;
     }

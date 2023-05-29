@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
  *
@@ -113,6 +114,7 @@ public class DirCacheTree extends AbstractTree {
      * @return the children of the Directory.
      */
     @Override
+    @Nonnull
     public List<Node> getChildren() {
       return children;
     }
