@@ -47,7 +47,7 @@ public abstract class AbstractTree implements FileTree {
     /**
      * Internal node constructor.
      * 
-     * @param name The name of the node.  The name of a leaf node may not be empty.
+     * @param name The name of the node.  The name of an internal node may be empty.
      * @param children The child nodes.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
