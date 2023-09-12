@@ -219,8 +219,8 @@ public class DirCacheImpl implements DirCache {
     }
 <span class="fc bfc" id="L220" title="All 4 branches covered.">    if (o1 instanceof DirCacheTree.Directory &amp;&amp; o2 instanceof DirCacheTree.File) {</span>
 <span class="fc" id="L221">      return -1;</span>
-<span class="fc bfc" id="L222" title="All 4 branches covered.">    } else if (o2 instanceof DirCacheTree.Directory &amp;&amp; o1 instanceof DirCacheTree.File) {</span>
-<span class="fc" id="L223">      return 1;</span>
+<span class="pc bpc" id="L222" title="1 of 4 branches missed.">    } else if (o2 instanceof DirCacheTree.Directory &amp;&amp; o1 instanceof DirCacheTree.File) {</span>
+<span class="nc" id="L223">      return 1;</span>
     }
 <span class="fc bfc" id="L225" title="All 2 branches covered.">    if (o1 == null) {</span>
 <span class="pc bpc" id="L226" title="1 of 2 branches missed.">      if (o2 != null) {</span>
