@@ -196,7 +196,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.6.2</version>
+                  <version>3.9.0</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>${jdk.version}</version>
