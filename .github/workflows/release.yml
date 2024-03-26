@@ -46,7 +46,11 @@ jobs:
         maven-version: 3.9.2
         
     - name: Build with Maven
-      run: mvn -P ci-cd -B clean install site --file pom.xml
+      env:
+        NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_PRIVATEKEY: ${{ secrets.GPG_PRIVATEKEY }}
+      run: mvn -X -P ci-cd -B clean install site --file pom.xml
       
     - uses: codecov/codecov-action@v3
       with:

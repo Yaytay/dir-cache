@@ -426,7 +426,7 @@
           <suppressionFiles>
             dependency-check-supressions.xml
           </suppressionFiles>
-          <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey>
+          <nvdApiKey>${NVD_API_KEY}</nvdApiKey>
         </configuration>
         <executions>
           <execution>
