@@ -62,7 +62,9 @@ jobs:
       
     - name: Deploy with Maven to GitHub Packages
       env:
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_PRIVATEKEY: ${{ secrets.GPG_PRIVATEKEY }}
         GITHUB_ACTOR: ${{ github.actor }} # GITHUB_TOKEN is the default env for the password 
         GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password 
       run: |
