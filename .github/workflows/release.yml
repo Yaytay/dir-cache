@@ -86,7 +86,9 @@ jobs:
         
     - name: Deploy with Maven to Maven Central
       env:
-        MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_PRIVATEKEY: ${{ secrets.GPG_PRIVATEKEY }}
         MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
         MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
       run: |
