@@ -70,15 +70,16 @@ jobs:
       run: |
         mvn -B \
           -P ci-cd \
+          --batch-mode \
           -DskipTests \
-          -DaltDeploymentRepository=github::default::https://maven.pkg.github.com/$GITHUB_REPOSITORY \
+          -DaltDeploymentRepository=github::https://maven.pkg.github.com/$GITHUB_REPOSITORY \
           --file pom.xml \
           deploy
           
     - name: Set up maven for OSSRH deployment
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'zulu'
         server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
         server-username: MAVEN_USERNAME # env variable for username in deploy
@@ -94,8 +95,9 @@ jobs:
       run: |
         mvn -B \
           -P ci-cd \
+          --batch-mode \
           -DskipTests \
-          -DaltDeploymentRepository=ossrh::default::https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
+          -DaltDeploymentRepository=ossrh::https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
           --file pom.xml \
           deploy
           
