@@ -127,7 +127,7 @@ jobs:
         for dir in `find gh-pages/docs -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort -r | tail -n +4`; do rm -Rf "gh-pages/docs/$dir"; done
         mkdir -p gh-pages/docs/latest
         cp -R target/site/* gh-pages/docs/latest
-        echo "## Streaming XLSX Writer Releases" > gh-pages/docs/index.md
+        echo "## Dir Cache Releases" > gh-pages/docs/index.md
         echo >> gh-pages/docs/index.md
         echo "| Release | Site Root | JavaDocs |" >> gh-pages/docs/index.md
         for file in `find gh-pages/docs -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort -r`; do echo "| ${file##*/} | [${file##*/}/project-info.html](https://${GITHUB_ACTOR}.github.io/${GITHUB_REPOSITORY##*/}/${file##*/}/project-info.html) | [${file##*/}/apidocs/index.html](https://${GITHUB_ACTOR}.github.io/${GITHUB_REPOSITORY##*/}/${file##*/}/apidocs/index.html) | " >> gh-pages/docs/index.md; done
