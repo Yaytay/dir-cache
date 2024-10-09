@@ -1,4 +1,4 @@
-## Streaming XLSX Writer Releases
+## Dir Cache Releases
 
 | Release | Site Root | JavaDocs |
 | latest | [latest/project-info.html](https://Yaytay.github.io/dir-cache/latest/project-info.html) | [latest/apidocs/index.html](https://Yaytay.github.io/dir-cache/latest/apidocs/index.html) | 

@@ -217,8 +217,8 @@ public class DirCacheImpl implements DirCache {
 <span class="fc bfc" id="L217" title="All 2 branches covered.">    if (o1 == o2) {</span>
 <span class="fc" id="L218">      return 0;</span>
     }
-<span class="fc bfc" id="L220" title="All 4 branches covered.">    if (o1 instanceof DirCacheTree.Directory &amp;&amp; o2 instanceof DirCacheTree.File) {</span>
-<span class="fc" id="L221">      return -1;</span>
+<span class="pc bpc" id="L220" title="1 of 4 branches missed.">    if (o1 instanceof DirCacheTree.Directory &amp;&amp; o2 instanceof DirCacheTree.File) {</span>
+<span class="nc" id="L221">      return -1;</span>
 <span class="fc bfc" id="L222" title="All 4 branches covered.">    } else if (o2 instanceof DirCacheTree.Directory &amp;&amp; o1 instanceof DirCacheTree.File) {</span>
 <span class="fc" id="L223">      return 1;</span>
     }
@@ -340,4 +340,4 @@ public class DirCacheImpl implements DirCache {
 <span class="fc" id="L340">  }</span>
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
