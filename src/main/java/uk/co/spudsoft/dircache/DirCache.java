@@ -50,12 +50,13 @@ public interface DirCache extends AutoCloseable {
    * @param stabilizationgLag Time to wait after a file has changed before notifying the caller.
    * Note that the file structure is picked up by the DirCache immediately, it is only the callbacks that are delayed.
    * @param ignore Regular expression of files to ignore.
+   * @param pollPeriod Rescan the entire filesystem on every poll period, to be used on filesystems that don't support notifications.
    * @return a newly created DirCache instance.
    * @throws FileNotFoundException if the root Path cannot be found, or if it is not a directory.
    * @throws IOException if attempts to walk the directory tree fail.
    */
-  static DirCache cache(Path root, Duration stabilizationgLag, Pattern ignore) throws FileNotFoundException, IOException {
-    return new DirCacheImpl(root, stabilizationgLag, ignore).start();
+  static DirCache cache(Path root, Duration stabilizationgLag, Pattern ignore, Duration pollPeriod) throws FileNotFoundException, IOException {
+    return new DirCacheImpl(root, stabilizationgLag, ignore, pollPeriod).start();
   }
   
   /**

@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -68,11 +70,14 @@ public class DirCacheImpl implements DirCache {
   private final AtomicBoolean stopped = new AtomicBoolean(false);
   private final Path rootPath;
   private final long stabilizationgLagMillis;
+  private final long pollPeriodMillis;
   private final Pattern ignore;
   private Thread thread;
+  private Timer pollingTimer;
+  private PollTask pollingTask;
   private WatchService watcher;
-  private LocalDateTime lastWalkTime;
-  private DirCacheTree.Directory rootNode;
+  private volatile LocalDateTime lastWalkTime;
+  private volatile DirCacheTree.Directory rootNode;
   
   private Runnable callback;  
 
@@ -87,12 +92,22 @@ public class DirCacheImpl implements DirCache {
    * @param stabilizationgLag Time to wait after a file has changed before notifying the caller.
    * Note that the file structure is picked up by the DirCache immediately, it is only the callbacks that are delayed.
    * @param ignore Regular expression of files to ignore.
+   * @param pollPeriod Rescan the entire filesystem on every poll period, to be used on filesystems that don't support notifications.
    * @throws FileNotFoundException if the root Path cannot be found, or if it is not a directory.
    * @throws IOException if attempts to walk the directory tree fail.
    */
-  public DirCacheImpl(Path root, Duration stabilizationgLag, Pattern ignore) throws FileNotFoundException, IOException {
+  public DirCacheImpl(Path root, Duration stabilizationgLag, Pattern ignore, Duration pollPeriod) throws FileNotFoundException, IOException {
     this.rootPath = root;
-    this.stabilizationgLagMillis = stabilizationgLag.toMillis();
+    if (stabilizationgLag == null) {
+      this.stabilizationgLagMillis = -1;
+    } else {
+      this.stabilizationgLagMillis = stabilizationgLag.toMillis();
+    }
+    if (pollPeriod == null) {
+      this.pollPeriodMillis = -1;
+    } else {
+      this.pollPeriodMillis = pollPeriod.toMillis();
+    }
     this.ignore = ignore;
   }
 
@@ -101,14 +116,35 @@ public class DirCacheImpl implements DirCache {
     return rootNode;
   }
 
+  private class PollTask extends TimerTask {
+
+    @Override
+    public void run() {      
+      DirCacheTree.Directory oldRoot = rootNode;
+      walk("poll");
+      DirCacheTree.Directory newRoot = rootNode;
+      if (!newRoot.equals(oldRoot) && callback != null) {
+        callback.run();
+      }
+    }
+    
+  }
+  
   @Override
   public DirCacheImpl start() throws IOException {
     logger.info("Starting DirCache of {}", rootPath);
     stopped.set(false);
     watcher = FileSystems.getDefault().newWatchService();
-    walk();
-    thread = new Thread(this::thread, "DirCache: " + rootPath.toString());    
-    thread.start();
+    walk("initialization");
+    if (stabilizationgLagMillis >= 0) {
+      thread = new Thread(this::thread, "DirCache#watch: " + rootPath.toString());
+      thread.start();
+    }
+    if (pollPeriodMillis > 0) {
+      pollingTimer = new Timer();
+      pollingTask = new PollTask();
+      pollingTimer.scheduleAtFixedRate(pollingTask, 500, pollPeriodMillis);
+    }
     return this;
   }
 
@@ -116,17 +152,26 @@ public class DirCacheImpl implements DirCache {
   public DirCacheImpl stop() {
     stopped.set(true);
     try {
-      watcher.close();
+      if (watcher != null) {
+        watcher.close();
+      }
     } catch (IOException ex) {
       logger.info("Failed to close dir cache file watcher: ", ex);
     }
     try {
-      thread.join();
+      if (thread != null) {
+        thread.join();
+      }
     } catch (InterruptedException ex) {
       logger.info("Interrupted whilst waiting for thread to stop");
     }
     watcher = null;
+    thread = null;
     watches.clear();
+    if (pollingTimer != null) {
+      pollingTimer.cancel();
+    }
+    pollingTimer = null;
     return this;
   }
 
@@ -185,7 +230,7 @@ public class DirCacheImpl implements DirCache {
       }
       
       if (wasDeleteOrTimeout) {
-        walk();
+        walk("change notification");
         if (wasOnlyDeletes) {
           active = false;
           if (callback != null) {
@@ -309,13 +354,13 @@ public class DirCacheImpl implements DirCache {
 
   @Override
   public void refresh() {
-    walk();
+    walk("manual refresh");
   }
   
-  private void walk() {
+  private void walk(String reason) {
     Visitor visitor = new Visitor();
     LocalDateTime walkTime = LocalDateTime.now();
-    logger.debug("Scanning file tree after change notification");
+    logger.debug("Scanning file tree for {}", reason);
     synchronized (scanLock) {
       try {
         Files.walkFileTree(rootPath, EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, visitor);
