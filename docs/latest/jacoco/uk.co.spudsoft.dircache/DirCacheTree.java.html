@@ -195,7 +195,7 @@ public class DirCacheTree extends AbstractTree {
      * @param &lt;F&gt; The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
      * @param fileMapper Method for mapping a File to a mapped File.
      * @return The result of called dirMapper on this Directory with all of its children mapped.
-     */
+    */
     public &lt;F&gt; List&lt;F&gt; flatten(Function&lt;File, F&gt; fileMapper) {
 <span class="fc" id="L200">      List&lt;F&gt; mappedChildren = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L201">      Directory.this.flatten(mappedChildren, fileMapper);</span>

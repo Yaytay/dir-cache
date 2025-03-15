@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -60,19 +62,22 @@ import uk.co.spudsoft.dircache.DirCacheTree;
  */
 public class DirCacheImpl implements DirCache {
 
-<span class="fc" id="L63">  private static final Logger logger = LoggerFactory.getLogger(DirCacheImpl.class);</span>
+<span class="fc" id="L65">  private static final Logger logger = LoggerFactory.getLogger(DirCacheImpl.class);</span>
 
-<span class="fc" id="L65">  private final Object readLock = new Object();</span>
-<span class="fc" id="L66">  private final Object scanLock = new Object();</span>
-<span class="fc" id="L67">  private final Map&lt;Path, WatchKey&gt; watches = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L68">  private final AtomicBoolean stopped = new AtomicBoolean(false);</span>
+<span class="fc" id="L67">  private final Object readLock = new Object();</span>
+<span class="fc" id="L68">  private final Object scanLock = new Object();</span>
+<span class="fc" id="L69">  private final Map&lt;Path, WatchKey&gt; watches = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L70">  private final AtomicBoolean stopped = new AtomicBoolean(false);</span>
   private final Path rootPath;
   private final long stabilizationgLagMillis;
+  private final long pollPeriodMillis;
   private final Pattern ignore;
   private Thread thread;
+  private Timer pollingTimer;
+  private PollTask pollingTask;
   private WatchService watcher;
-  private LocalDateTime lastWalkTime;
-  private DirCacheTree.Directory rootNode;
+  private volatile LocalDateTime lastWalkTime;
+  private volatile DirCacheTree.Directory rootNode;
   
   private Runnable callback;  
 
@@ -87,114 +92,154 @@ public class DirCacheImpl implements DirCache {
    * @param stabilizationgLag Time to wait after a file has changed before notifying the caller.
    * Note that the file structure is picked up by the DirCache immediately, it is only the callbacks that are delayed.
    * @param ignore Regular expression of files to ignore.
+   * @param pollPeriod Rescan the entire filesystem on every poll period, to be used on filesystems that don't support notifications.
    * @throws FileNotFoundException if the root Path cannot be found, or if it is not a directory.
    * @throws IOException if attempts to walk the directory tree fail.
    */
-<span class="fc" id="L93">  public DirCacheImpl(Path root, Duration stabilizationgLag, Pattern ignore) throws FileNotFoundException, IOException {</span>
-<span class="fc" id="L94">    this.rootPath = root;</span>
-<span class="fc" id="L95">    this.stabilizationgLagMillis = stabilizationgLag.toMillis();</span>
-<span class="fc" id="L96">    this.ignore = ignore;</span>
-<span class="fc" id="L97">  }</span>
+<span class="fc" id="L99">  public DirCacheImpl(Path root, Duration stabilizationgLag, Pattern ignore, Duration pollPeriod) throws FileNotFoundException, IOException {</span>
+<span class="fc" id="L100">    this.rootPath = root;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    if (stabilizationgLag == null) {</span>
+<span class="fc" id="L102">      this.stabilizationgLagMillis = -1;</span>
+    } else {
+<span class="fc" id="L104">      this.stabilizationgLagMillis = stabilizationgLag.toMillis();</span>
+    }
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (pollPeriod == null) {</span>
+<span class="fc" id="L107">      this.pollPeriodMillis = -1;</span>
+    } else {
+<span class="fc" id="L109">      this.pollPeriodMillis = pollPeriod.toMillis();</span>
+    }
+<span class="fc" id="L111">    this.ignore = ignore;</span>
+<span class="fc" id="L112">  }</span>
 
   @Override
   public DirCacheTree.Directory getRoot() {
-<span class="fc" id="L101">    return rootNode;</span>
+<span class="fc" id="L116">    return rootNode;</span>
   }
 
+<span class="fc" id="L119">  private class PollTask extends TimerTask {</span>
+
+    @Override
+    public void run() {      
+<span class="fc" id="L123">      DirCacheTree.Directory oldRoot = rootNode;</span>
+<span class="fc" id="L124">      walk(&quot;poll&quot;);</span>
+<span class="fc" id="L125">      DirCacheTree.Directory newRoot = rootNode;</span>
+<span class="fc bfc" id="L126" title="All 4 branches covered.">      if (!newRoot.equals(oldRoot) &amp;&amp; callback != null) {</span>
+<span class="fc" id="L127">        callback.run();</span>
+      }
+<span class="fc" id="L129">    }</span>
+    
+  }
+  
   @Override
   public DirCacheImpl start() throws IOException {
-<span class="fc" id="L106">    logger.info(&quot;Starting DirCache of {}&quot;, rootPath);</span>
-<span class="fc" id="L107">    stopped.set(false);</span>
-<span class="fc" id="L108">    watcher = FileSystems.getDefault().newWatchService();</span>
-<span class="fc" id="L109">    walk();</span>
-<span class="fc" id="L110">    thread = new Thread(this::thread, &quot;DirCache: &quot; + rootPath.toString());    </span>
-<span class="fc" id="L111">    thread.start();</span>
-<span class="fc" id="L112">    return this;</span>
+<span class="fc" id="L135">    logger.info(&quot;Starting DirCache of {}&quot;, rootPath);</span>
+<span class="fc" id="L136">    stopped.set(false);</span>
+<span class="fc" id="L137">    watcher = FileSystems.getDefault().newWatchService();</span>
+<span class="fc" id="L138">    walk(&quot;initialization&quot;);</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">    if (stabilizationgLagMillis &gt;= 0) {</span>
+<span class="fc" id="L140">      thread = new Thread(this::thread, &quot;DirCache#watch: &quot; + rootPath.toString());</span>
+<span class="fc" id="L141">      thread.start();</span>
+    }
+<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (pollPeriodMillis &gt; 0) {</span>
+<span class="fc" id="L144">      pollingTimer = new Timer();</span>
+<span class="fc" id="L145">      pollingTask = new PollTask();</span>
+<span class="fc" id="L146">      pollingTimer.scheduleAtFixedRate(pollingTask, 500, pollPeriodMillis);</span>
+    }
+<span class="fc" id="L148">    return this;</span>
   }
 
   @Override
   public DirCacheImpl stop() {
-<span class="fc" id="L117">    stopped.set(true);</span>
+<span class="fc" id="L153">    stopped.set(true);</span>
     try {
-<span class="fc" id="L119">      watcher.close();</span>
-<span class="nc" id="L120">    } catch (IOException ex) {</span>
-<span class="nc" id="L121">      logger.info(&quot;Failed to close dir cache file watcher: &quot;, ex);</span>
-<span class="fc" id="L122">    }</span>
+<span class="pc bpc" id="L155" title="1 of 2 branches missed.">      if (watcher != null) {</span>
+<span class="fc" id="L156">        watcher.close();</span>
+      }
+<span class="nc" id="L158">    } catch (IOException ex) {</span>
+<span class="nc" id="L159">      logger.info(&quot;Failed to close dir cache file watcher: &quot;, ex);</span>
+<span class="fc" id="L160">    }</span>
     try {
-<span class="fc" id="L124">      thread.join();</span>
-<span class="nc" id="L125">    } catch (InterruptedException ex) {</span>
-<span class="nc" id="L126">      logger.info(&quot;Interrupted whilst waiting for thread to stop&quot;);</span>
-<span class="fc" id="L127">    }</span>
-<span class="fc" id="L128">    watcher = null;</span>
-<span class="fc" id="L129">    watches.clear();</span>
-<span class="fc" id="L130">    return this;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">      if (thread != null) {</span>
+<span class="fc" id="L163">        thread.join();</span>
+      }
+<span class="nc" id="L165">    } catch (InterruptedException ex) {</span>
+<span class="nc" id="L166">      logger.info(&quot;Interrupted whilst waiting for thread to stop&quot;);</span>
+<span class="fc" id="L167">    }</span>
+<span class="fc" id="L168">    watcher = null;</span>
+<span class="fc" id="L169">    thread = null;</span>
+<span class="fc" id="L170">    watches.clear();</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">    if (pollingTimer != null) {</span>
+<span class="fc" id="L172">      pollingTimer.cancel();</span>
+    }
+<span class="fc" id="L174">    pollingTimer = null;</span>
+<span class="fc" id="L175">    return this;</span>
   }
 
   @Override
   public void close() {
-<span class="fc" id="L135">    stop();</span>
-<span class="fc" id="L136">  }</span>
+<span class="fc" id="L180">    stop();</span>
+<span class="fc" id="L181">  }</span>
 
   @Override
   public DirCacheImpl setCallback(Runnable callback) {
-<span class="fc" id="L140">    this.callback = callback;</span>
-<span class="fc" id="L141">    return this;</span>
+<span class="fc" id="L185">    this.callback = callback;</span>
+<span class="fc" id="L186">    return this;</span>
   }
 
   @Override
   public LocalDateTime getLastWalkTime() {
-<span class="fc" id="L146">    return lastWalkTime;</span>
+<span class="fc" id="L191">    return lastWalkTime;</span>
   }
   
   private void thread() {
-<span class="fc" id="L150">    boolean active = false;</span>
+<span class="fc" id="L195">    boolean active = false;</span>
 
-<span class="fc bfc" id="L152" title="All 2 branches covered.">    while (!stopped.get()) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">    while (!stopped.get()) {</span>
       // wait for key to be signaled
       WatchKey key;
       try {
-<span class="fc bfc" id="L156" title="All 2 branches covered.">        if (active) {</span>
-<span class="fc" id="L157">          key = watcher.poll(stabilizationgLagMillis, TimeUnit.MILLISECONDS);</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        if (active) {</span>
+<span class="fc" id="L202">          key = watcher.poll(stabilizationgLagMillis, TimeUnit.MILLISECONDS);</span>
         } else {
-<span class="fc" id="L159">          key = watcher.take();</span>
-<span class="fc" id="L160">          active = true;</span>
+<span class="fc" id="L204">          key = watcher.take();</span>
+<span class="fc" id="L205">          active = true;</span>
         }
-<span class="fc" id="L162">      } catch (ClosedWatchServiceException x) {</span>
-<span class="fc" id="L163">        stopped.set(true);</span>
-<span class="fc" id="L164">        continue ;</span>
-<span class="nc" id="L165">      } catch (InterruptedException x) {</span>
-<span class="nc" id="L166">        continue ;</span>
-<span class="fc" id="L167">      }</span>
+<span class="fc" id="L207">      } catch (ClosedWatchServiceException x) {</span>
+<span class="fc" id="L208">        stopped.set(true);</span>
+<span class="fc" id="L209">        continue ;</span>
+<span class="nc" id="L210">      } catch (InterruptedException x) {</span>
+<span class="nc" id="L211">        continue ;</span>
+<span class="fc" id="L212">      }</span>
 
-<span class="fc" id="L169">      boolean wasDeleteOrTimeout = false;</span>
-<span class="fc" id="L170">      boolean wasOnlyDeletes = true;</span>
-<span class="fc bfc" id="L171" title="All 2 branches covered.">      if (key == null) {</span>
-<span class="fc" id="L172">        wasDeleteOrTimeout = true;</span>
+<span class="fc" id="L214">      boolean wasDeleteOrTimeout = false;</span>
+<span class="fc" id="L215">      boolean wasOnlyDeletes = true;</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">      if (key == null) {</span>
+<span class="fc" id="L217">        wasDeleteOrTimeout = true;</span>
       } else {
-<span class="fc bfc" id="L174" title="All 2 branches covered.">        for (WatchEvent&lt;?&gt; event : key.pollEvents()) {</span>
+<span class="fc bfc" id="L219" title="All 2 branches covered.">        for (WatchEvent&lt;?&gt; event : key.pollEvents()) {</span>
           // Pick up deletes immediately, everything else can wait
-<span class="fc bfc" id="L176" title="All 2 branches covered.">          if (event.kind() == ENTRY_DELETE) {</span>
-<span class="fc" id="L177">            wasDeleteOrTimeout = true;</span>
+<span class="fc bfc" id="L221" title="All 2 branches covered.">          if (event.kind() == ENTRY_DELETE) {</span>
+<span class="fc" id="L222">            wasDeleteOrTimeout = true;</span>
           } else {
-<span class="fc" id="L179">            wasOnlyDeletes = false;</span>
+<span class="fc" id="L224">            wasOnlyDeletes = false;</span>
           }
-<span class="fc" id="L181">        }</span>
-<span class="fc bfc" id="L182" title="All 2 branches covered.">        if (!key.reset()) {</span>
-<span class="fc" id="L183">          watches.remove((Path) key.watchable());</span>
+<span class="fc" id="L226">        }</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (!key.reset()) {</span>
+<span class="fc" id="L228">          watches.remove((Path) key.watchable());</span>
         }
       }
       
-<span class="fc bfc" id="L187" title="All 2 branches covered.">      if (wasDeleteOrTimeout) {</span>
-<span class="fc" id="L188">        walk();</span>
-<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        if (wasOnlyDeletes) {</span>
-<span class="fc" id="L190">          active = false;</span>
-<span class="fc bfc" id="L191" title="All 2 branches covered.">          if (callback != null) {</span>
-<span class="fc" id="L192">            callback.run();</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">      if (wasDeleteOrTimeout) {</span>
+<span class="fc" id="L233">        walk(&quot;change notification&quot;);</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (wasOnlyDeletes) {</span>
+<span class="fc" id="L235">          active = false;</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">          if (callback != null) {</span>
+<span class="fc" id="L237">            callback.run();</span>
           }
         }
       }
-<span class="fc" id="L196">    }</span>
-<span class="fc" id="L197">  }</span>
+<span class="fc" id="L241">    }</span>
+<span class="fc" id="L242">  }</span>
 
   private static class PathAndNodeList {
 
@@ -202,142 +247,142 @@ public class DirCacheImpl implements DirCache {
     private final LocalDateTime lastModified;
     public final List&lt;DirCacheTree.Node&gt; nodeList;
 
-<span class="fc" id="L205">    PathAndNodeList(Path path, LocalDateTime lastModified) {</span>
-<span class="fc" id="L206">      this.path = path;</span>
-<span class="fc" id="L207">      this.lastModified = lastModified;</span>
-<span class="fc" id="L208">      this.nodeList = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L209">    }</span>
+<span class="fc" id="L250">    PathAndNodeList(Path path, LocalDateTime lastModified) {</span>
+<span class="fc" id="L251">      this.path = path;</span>
+<span class="fc" id="L252">      this.lastModified = lastModified;</span>
+<span class="fc" id="L253">      this.nodeList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L254">    }</span>
     
     void sort() {
-<span class="fc" id="L212">      nodeList.sort(DirCacheImpl::compareNodes);</span>
-<span class="fc" id="L213">    }</span>
+<span class="fc" id="L257">      nodeList.sort(DirCacheImpl::compareNodes);</span>
+<span class="fc" id="L258">    }</span>
   }
   
   static int compareNodes(DirCacheTree.Node o1, DirCacheTree.Node o2) {
-<span class="fc bfc" id="L217" title="All 2 branches covered.">    if (o1 == o2) {</span>
-<span class="fc" id="L218">      return 0;</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">    if (o1 == o2) {</span>
+<span class="fc" id="L263">      return 0;</span>
     }
-<span class="pc bpc" id="L220" title="1 of 4 branches missed.">    if (o1 instanceof DirCacheTree.Directory &amp;&amp; o2 instanceof DirCacheTree.File) {</span>
-<span class="nc" id="L221">      return -1;</span>
-<span class="fc bfc" id="L222" title="All 4 branches covered.">    } else if (o2 instanceof DirCacheTree.Directory &amp;&amp; o1 instanceof DirCacheTree.File) {</span>
-<span class="fc" id="L223">      return 1;</span>
+<span class="fc bfc" id="L265" title="All 4 branches covered.">    if (o1 instanceof DirCacheTree.Directory &amp;&amp; o2 instanceof DirCacheTree.File) {</span>
+<span class="fc" id="L266">      return -1;</span>
+<span class="fc bfc" id="L267" title="All 4 branches covered.">    } else if (o2 instanceof DirCacheTree.Directory &amp;&amp; o1 instanceof DirCacheTree.File) {</span>
+<span class="fc" id="L268">      return 1;</span>
     }
-<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (o1 == null) {</span>
-<span class="pc bpc" id="L226" title="1 of 2 branches missed.">      if (o2 != null) {</span>
-<span class="fc" id="L227">        return -1;</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">    if (o1 == null) {</span>
+<span class="pc bpc" id="L271" title="1 of 2 branches missed.">      if (o2 != null) {</span>
+<span class="fc" id="L272">        return -1;</span>
       } else {
-<span class="nc" id="L229">        return 0;</span>
+<span class="nc" id="L274">        return 0;</span>
       }
-<span class="fc bfc" id="L231" title="All 2 branches covered.">    } else if (o2 == null) {</span>
-<span class="fc" id="L232">      return 1;</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">    } else if (o2 == null) {</span>
+<span class="fc" id="L277">      return 1;</span>
     } 
-<span class="fc" id="L234">    return o1.getName().compareTo(o2.getName());</span>
+<span class="fc" id="L279">    return o1.getName().compareTo(o2.getName());</span>
   }
 
-<span class="fc" id="L237">  private class Visitor implements FileVisitor&lt;Path&gt; {</span>
+<span class="fc" id="L282">  private class Visitor implements FileVisitor&lt;Path&gt; {</span>
 
-<span class="fc" id="L239">    private final List&lt;Path&gt; dirsFound = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L240">    private final Stack&lt;PathAndNodeList&gt; dirStack = new Stack&lt;&gt;();</span>
+<span class="fc" id="L284">    private final List&lt;Path&gt; dirsFound = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L285">    private final Stack&lt;PathAndNodeList&gt; dirStack = new Stack&lt;&gt;();</span>
     private DirCacheTree.Directory root;
 
     public DirCacheTree.Directory getRoot() {
-<span class="fc" id="L244">      return root;</span>
+<span class="fc" id="L289">      return root;</span>
     }
 
     public List&lt;Path&gt; getDirsFound() {
-<span class="fc" id="L248">      return dirsFound;</span>
+<span class="fc" id="L293">      return dirsFound;</span>
     }
     
     private LocalDateTime getLastModified(BasicFileAttributes attrs) {
-<span class="fc" id="L252">      return LocalDateTime.ofInstant(attrs.lastModifiedTime().toInstant(), ZoneOffset.UTC);</span>
+<span class="fc" id="L297">      return LocalDateTime.ofInstant(attrs.lastModifiedTime().toInstant(), ZoneOffset.UTC);</span>
     }
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-<span class="fc bfc" id="L257" title="All 2 branches covered.">      if (ignore.matcher(dir.getFileName().toString()).matches()) {</span>
-<span class="fc" id="L258">        logger.trace(&quot;preVisitDirectory({}, {}) - IGNORED&quot;, dir, attrs.lastModifiedTime());</span>
-<span class="fc" id="L259">        return FileVisitResult.SKIP_SUBTREE;</span>
+<span class="fc bfc" id="L302" title="All 2 branches covered.">      if (ignore.matcher(dir.getFileName().toString()).matches()) {</span>
+<span class="fc" id="L303">        logger.trace(&quot;preVisitDirectory({}, {}) - IGNORED&quot;, dir, attrs.lastModifiedTime());</span>
+<span class="fc" id="L304">        return FileVisitResult.SKIP_SUBTREE;</span>
       } else {
-<span class="fc" id="L261">        logger.trace(&quot;preVisitDirectory({}, {})&quot;, dir, attrs.lastModifiedTime());</span>
-<span class="fc" id="L262">        dirStack.add(new PathAndNodeList(dir, getLastModified(attrs)));</span>
-<span class="fc" id="L263">        dirsFound.add(dir);</span>
-<span class="fc bfc" id="L264" title="All 2 branches covered.">        if (!watches.containsKey(dir)) {</span>
+<span class="fc" id="L306">        logger.trace(&quot;preVisitDirectory({}, {})&quot;, dir, attrs.lastModifiedTime());</span>
+<span class="fc" id="L307">        dirStack.add(new PathAndNodeList(dir, getLastModified(attrs)));</span>
+<span class="fc" id="L308">        dirsFound.add(dir);</span>
+<span class="fc bfc" id="L309" title="All 2 branches covered.">        if (!watches.containsKey(dir)) {</span>
           try {
-<span class="fc" id="L266">            WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);</span>
-<span class="fc" id="L267">            watches.put(dir, key);</span>
-<span class="nc" id="L268">          } catch (IOException ex) {</span>
-<span class="nc" id="L269">            logger.warn(&quot;Failed to configure path watch for {}: &quot;, dir, ex);</span>
-<span class="fc" id="L270">          }</span>
+<span class="fc" id="L311">            WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);</span>
+<span class="fc" id="L312">            watches.put(dir, key);</span>
+<span class="nc" id="L313">          } catch (IOException ex) {</span>
+<span class="nc" id="L314">            logger.warn(&quot;Failed to configure path watch for {}: &quot;, dir, ex);</span>
+<span class="fc" id="L315">          }</span>
         }
-<span class="fc" id="L272">        return FileVisitResult.CONTINUE;</span>
+<span class="fc" id="L317">        return FileVisitResult.CONTINUE;</span>
       }
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-<span class="fc bfc" id="L278" title="All 2 branches covered.">      if (!ignore.matcher(file.getFileName().toString()).matches()) {</span>
-<span class="fc" id="L279">        logger.trace(&quot;visitFile({}, {}) in {}&quot;, file, attrs.lastModifiedTime(), dirStack.peek());</span>
-<span class="fc" id="L280">        PathAndNodeList parent = dirStack.peek();</span>
-<span class="fc" id="L281">        DirCacheTree.File thisFile = new DirCacheTree.File(file, getLastModified(attrs), attrs.size());</span>
-<span class="fc" id="L282">        parent.nodeList.add(thisFile);</span>
+<span class="fc bfc" id="L323" title="All 2 branches covered.">      if (!ignore.matcher(file.getFileName().toString()).matches()) {</span>
+<span class="fc" id="L324">        logger.trace(&quot;visitFile({}, {}) in {}&quot;, file, attrs.lastModifiedTime(), dirStack.peek());</span>
+<span class="fc" id="L325">        PathAndNodeList parent = dirStack.peek();</span>
+<span class="fc" id="L326">        DirCacheTree.File thisFile = new DirCacheTree.File(file, getLastModified(attrs), attrs.size());</span>
+<span class="fc" id="L327">        parent.nodeList.add(thisFile);</span>
       }
-<span class="fc" id="L284">      return FileVisitResult.CONTINUE;</span>
+<span class="fc" id="L329">      return FileVisitResult.CONTINUE;</span>
     }
 
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-<span class="nc" id="L289">      logger.trace(&quot;visitFileFailed({}, {})&quot;, file, exc);</span>
-<span class="nc" id="L290">      return FileVisitResult.CONTINUE;</span>
+<span class="nc" id="L334">      logger.trace(&quot;visitFileFailed({}, {})&quot;, file, exc);</span>
+<span class="nc" id="L335">      return FileVisitResult.CONTINUE;</span>
     }
 
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-<span class="fc" id="L295">      logger.trace(&quot;postVisitDirectory({}, {})&quot;, dir, exc);</span>
-<span class="fc" id="L296">      PathAndNodeList panl = dirStack.pop();</span>
-<span class="pc bpc" id="L297" title="1 of 2 branches missed.">      assert (dir.equals(panl.path));</span>
-<span class="fc" id="L298">      panl.sort();</span>
-<span class="fc" id="L299">      DirCacheTree.Directory thisDir = new DirCacheTree.Directory(dir, panl.lastModified, panl.nodeList);</span>
-<span class="fc bfc" id="L300" title="All 2 branches covered.">      if (dirStack.isEmpty()) {</span>
-<span class="fc" id="L301">        root = thisDir;</span>
+<span class="fc" id="L340">      logger.trace(&quot;postVisitDirectory({}, {})&quot;, dir, exc);</span>
+<span class="fc" id="L341">      PathAndNodeList panl = dirStack.pop();</span>
+<span class="pc bpc" id="L342" title="1 of 2 branches missed.">      assert (dir.equals(panl.path));</span>
+<span class="fc" id="L343">      panl.sort();</span>
+<span class="fc" id="L344">      DirCacheTree.Directory thisDir = new DirCacheTree.Directory(dir, panl.lastModified, panl.nodeList);</span>
+<span class="fc bfc" id="L345" title="All 2 branches covered.">      if (dirStack.isEmpty()) {</span>
+<span class="fc" id="L346">        root = thisDir;</span>
       } else {
-<span class="fc" id="L303">        PathAndNodeList parent = dirStack.peek();</span>
-<span class="fc" id="L304">        parent.nodeList.add(thisDir);</span>
+<span class="fc" id="L348">        PathAndNodeList parent = dirStack.peek();</span>
+<span class="fc" id="L349">        parent.nodeList.add(thisDir);</span>
       }
-<span class="fc" id="L306">      return FileVisitResult.CONTINUE;</span>
+<span class="fc" id="L351">      return FileVisitResult.CONTINUE;</span>
     }
   }
 
   @Override
   public void refresh() {
-<span class="nc" id="L312">    walk();</span>
-<span class="nc" id="L313">  }</span>
+<span class="nc" id="L357">    walk(&quot;manual refresh&quot;);</span>
+<span class="nc" id="L358">  }</span>
   
-  private void walk() {
-<span class="fc" id="L316">    Visitor visitor = new Visitor();</span>
-<span class="fc" id="L317">    LocalDateTime walkTime = LocalDateTime.now();</span>
-<span class="fc" id="L318">    logger.debug(&quot;Scanning file tree after change notification&quot;);</span>
-<span class="fc" id="L319">    synchronized (scanLock) {</span>
+  private void walk(String reason) {
+<span class="fc" id="L361">    Visitor visitor = new Visitor();</span>
+<span class="fc" id="L362">    LocalDateTime walkTime = LocalDateTime.now();</span>
+<span class="fc" id="L363">    logger.debug(&quot;Scanning file tree for {}&quot;, reason);</span>
+<span class="fc" id="L364">    synchronized (scanLock) {</span>
       try {
-<span class="fc" id="L321">        Files.walkFileTree(rootPath, EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, visitor);</span>
-<span class="nc" id="L322">      } catch (Throwable ex) {</span>
-<span class="nc" id="L323">        logger.warn(&quot;Failed to update dir cache of {}: &quot;, rootPath, ex);</span>
-<span class="nc" id="L324">        return ;</span>
-<span class="fc" id="L325">      }</span>
+<span class="fc" id="L366">        Files.walkFileTree(rootPath, EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, visitor);</span>
+<span class="nc" id="L367">      } catch (Throwable ex) {</span>
+<span class="nc" id="L368">        logger.warn(&quot;Failed to update dir cache of {}: &quot;, rootPath, ex);</span>
+<span class="nc" id="L369">        return ;</span>
+<span class="fc" id="L370">      }</span>
       
-<span class="fc" id="L327">      synchronized (readLock) {</span>
-<span class="fc" id="L328">        this.rootNode = visitor.getRoot();</span>
-<span class="fc" id="L329">        this.lastWalkTime = walkTime;</span>
-<span class="fc" id="L330">      }</span>
-<span class="fc" id="L331">      Set&lt;Path&gt; dirsFound = new HashSet&lt;&gt;(visitor.getDirsFound());</span>
-<span class="fc bfc" id="L332" title="All 2 branches covered.">      for (Iterator&lt;Entry&lt;Path, WatchKey&gt;&gt; iter = watches.entrySet().iterator(); iter.hasNext();) {</span>
-<span class="fc" id="L333">        Entry&lt;Path, WatchKey&gt; watching = iter.next();</span>
-<span class="fc bfc" id="L334" title="All 2 branches covered.">        if (!dirsFound.contains(watching.getKey())) {</span>
-<span class="fc" id="L335">          logger.trace(&quot;Path {} no longer exists and is being removed from watches&quot;, watching.getKey());</span>
-<span class="fc" id="L336">          iter.remove();</span>
+<span class="fc" id="L372">      synchronized (readLock) {</span>
+<span class="fc" id="L373">        this.rootNode = visitor.getRoot();</span>
+<span class="fc" id="L374">        this.lastWalkTime = walkTime;</span>
+<span class="fc" id="L375">      }</span>
+<span class="fc" id="L376">      Set&lt;Path&gt; dirsFound = new HashSet&lt;&gt;(visitor.getDirsFound());</span>
+<span class="fc bfc" id="L377" title="All 2 branches covered.">      for (Iterator&lt;Entry&lt;Path, WatchKey&gt;&gt; iter = watches.entrySet().iterator(); iter.hasNext();) {</span>
+<span class="fc" id="L378">        Entry&lt;Path, WatchKey&gt; watching = iter.next();</span>
+<span class="fc bfc" id="L379" title="All 2 branches covered.">        if (!dirsFound.contains(watching.getKey())) {</span>
+<span class="fc" id="L380">          logger.trace(&quot;Path {} no longer exists and is being removed from watches&quot;, watching.getKey());</span>
+<span class="fc" id="L381">          iter.remove();</span>
         }
-<span class="fc" id="L338">      }</span>
-<span class="fc" id="L339">    }</span>
-<span class="fc" id="L340">  }</span>
+<span class="fc" id="L383">      }</span>
+<span class="fc" id="L384">    }</span>
+<span class="fc" id="L385">  }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
