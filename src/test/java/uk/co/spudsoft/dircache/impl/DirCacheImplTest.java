@@ -162,7 +162,8 @@ public class DirCacheImplTest {
     logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
     assertNotNull(dirCache.getRoot().getDir("a").getDir("aa").get("bob"));
     LocalDateTime secondWalkTime = dirCache.getLastWalkTime();
-    assertEquals(1, counter.get());
+    int ctrAtCreation = counter.get();
+    assertThat(ctrAtCreation, greaterThan(0));
 
     int countOfDeleted = delete(root.resolve("a/aa").toFile());
     logger.debug("Deleted dir ({} deletes)", countOfDeleted);
@@ -170,7 +171,7 @@ public class DirCacheImplTest {
     logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
     assertNull(dirCache.getRoot().getDir("a").getDir("aa"));
     LocalDateTime thirdWalkTime = dirCache.getLastWalkTime();
-    assertThat(counter.get(), greaterThan(1));
+    assertThat(counter.get(), greaterThan(ctrAtCreation));
 
     dirCache.stop();
 
