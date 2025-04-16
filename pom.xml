@@ -466,6 +466,9 @@
             <goals>
               <goal>download-licenses</goal>
             </goals>
+            <configuration>
+              <licensesOutputDirectory>${user.home}/.m2/licenses</licensesOutputDirectory>
+            </configuration>
           </execution>
         </executions>
       </plugin>
