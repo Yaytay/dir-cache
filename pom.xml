@@ -41,8 +41,8 @@
     <jackson.version>[2.14,]</jackson.version>
     <slf4j.version>[1.7,)</slf4j.version>
     <logback.version>[1.2,)</logback.version>
-    <junit-jupiter.version>5.12.1</junit-jupiter.version>
-    <junit-platform.version>1.12.1</junit-platform.version>
+    <junit-jupiter.version>5.12.2</junit-jupiter.version>
+    <junit-platform.version>1.12.2</junit-platform.version>
   </properties>
   
   <dependencies>
@@ -123,7 +123,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>5.17.0</version>
+      <version>5.18.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -269,7 +269,7 @@
             <plugin>
               <groupId>com.h3xstream.findsecbugs</groupId>
               <artifactId>findsecbugs-plugin</artifactId>
-              <version>1.13.0</version>
+              <version>1.14.0</version>
             </plugin>
           </plugins>
         </configuration>
@@ -307,7 +307,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>10.23.0</version>
+            <version>10.24.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -530,7 +530,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.13</version>
         <reportSets>
           <reportSet>
             <reports>
