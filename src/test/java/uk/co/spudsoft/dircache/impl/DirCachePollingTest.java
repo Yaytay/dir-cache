@@ -21,7 +21,9 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import static com.jayway.awaitility.Awaitility.await;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -69,10 +71,20 @@ public class DirCachePollingTest {
     assertNotNull(dirCache.getRoot().getDir("a").getDir("aa").get("fred"));
     LocalDateTime secondWalkTime = dirCache.getLastWalkTime();
     
-
+    logger.debug("Changing file");
+    try (FileOutputStream fos = new FileOutputStream(root.resolve("a/aa/fred").toFile())) {
+      fos.write("Boo".getBytes(StandardCharsets.UTF_8));
+    }
+    // Have to wait a few poll periods to ensure it got it stable, and also to check that it does callback on every poll
+    Thread.sleep(1000);
+    await().atMost(5, SECONDS).until(() -> secondWalkTime.isBefore(dirCache.getLastWalkTime()));
+    logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
+    assertNotNull(dirCache.getRoot().getDir("a").getDir("aa").get("fred"));
+    LocalDateTime thirdWalkTime = dirCache.getLastWalkTime();
+    
     int countOfDeleted = delete(root.resolve("a/aa").toFile());
     logger.debug("Deleted dir ({} deletes)", countOfDeleted);
-    await().atMost(5, SECONDS).until(() -> secondWalkTime.isBefore(dirCache.getLastWalkTime()));
+    await().atMost(5, SECONDS).until(() -> thirdWalkTime.isBefore(dirCache.getLastWalkTime()));
     logger.debug("Result: {}", MAPPER.writeValueAsString(dirCache.getRoot()));
     assertNull(dirCache.getRoot().getDir("a").getDir("aa"));
     

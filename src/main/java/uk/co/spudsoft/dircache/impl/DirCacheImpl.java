@@ -370,7 +370,11 @@ public class DirCacheImpl implements DirCache {
       }
       
       synchronized (readLock) {
-        this.rootNode = visitor.getRoot();
+        if (this.rootNode == null) {
+          this.rootNode = visitor.getRoot();
+        } else if (!this.rootNode.equals(visitor.getRoot())) {
+          this.rootNode = visitor.getRoot();
+        }
         this.lastWalkTime = walkTime;
       }
       Set<Path> dirsFound = new HashSet<>(visitor.getDirsFound());

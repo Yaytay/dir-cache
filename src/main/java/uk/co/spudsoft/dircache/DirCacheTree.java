@@ -27,6 +27,8 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
  */
 public class DirCacheTree extends AbstractTree {
 
+  private static final Logger logger = LoggerFactory.getLogger(DirCacheTree.class);
+  
   private DirCacheTree() {
   }
   
@@ -86,6 +90,7 @@ public class DirCacheTree extends AbstractTree {
         return false;
       }
       if (!Objects.equals(this.modified, other.modified)) {
+        logger.debug("{} changed at {}", this.path, this.modified);
         return false;
       }
       return Objects.equals(this.children, other.children);
@@ -224,6 +229,7 @@ public class DirCacheTree extends AbstractTree {
       if (!super.privateMembersEqual(other)) {
         return false;
       }
+      
       return Objects.equals(this.children, other.children);
     }
     
@@ -278,6 +284,7 @@ public class DirCacheTree extends AbstractTree {
       }
       final File other = (File) obj;
       if (this.size != other.size) {
+        logger.debug("{} changed size from {} to {}", this.path, other.size, this.size);
         return false;
       }
       return super.privateMembersEqual(other);
@@ -287,7 +294,6 @@ public class DirCacheTree extends AbstractTree {
     public String toString() {
       return path + " (" + size + " bytes @ " + modified + ')';
     }
-
   }
   
 }
