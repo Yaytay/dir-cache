@@ -120,11 +120,10 @@ public class DirCacheImpl implements DirCache {
 
     @Override
     public void run() {      
-      DirCacheTree.Directory oldRoot = rootNode;
-      walk("poll");
-      DirCacheTree.Directory newRoot = rootNode;
-      if (!newRoot.equals(oldRoot) && callback != null) {
-        callback.run();
+      if (walk("poll")) {
+        if (callback != null) {
+          callback.run();
+        }
       }
     }
     
@@ -357,22 +356,21 @@ public class DirCacheImpl implements DirCache {
     walk("manual refresh");
   }
   
-  private void walk(String reason) {
+  private boolean walk(String reason) {
     Visitor visitor = new Visitor();
     LocalDateTime walkTime = LocalDateTime.now();
     logger.debug("Scanning file tree for {}", reason);
+    boolean changed = false;
     synchronized (scanLock) {
       try {
         Files.walkFileTree(rootPath, EnumSet.of(FOLLOW_LINKS), Integer.MAX_VALUE, visitor);
       } catch (Throwable ex) {
         logger.warn("Failed to update dir cache of {}: ", rootPath, ex);
-        return ;
       }
       
       synchronized (readLock) {
-        if (this.rootNode == null) {
-          this.rootNode = visitor.getRoot();
-        } else if (!this.rootNode.equals(visitor.getRoot())) {
+        if (this.rootNode == null || !this.rootNode.equals(visitor.getRoot())) {
+          changed = true;
           this.rootNode = visitor.getRoot();
         }
         this.lastWalkTime = walkTime;
@@ -385,6 +383,7 @@ public class DirCacheImpl implements DirCache {
           iter.remove();
         }
       }
+      return changed;
     }
   }
 
