@@ -1,11 +1,12 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Dir Cache,uk.co.spudsoft.dircache,AbstractTree.AbstractNode,4,57,1,9,0,16,1,10,0,6
-Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.Node,2,95,1,5,1,22,1,8,0,6
+Dir Cache,uk.co.spudsoft.dircache,DirCacheTree,0,4,0,0,0,1,0,1,0,1
+Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.Node,2,102,1,5,1,23,1,8,0,6
 Dir Cache,uk.co.spudsoft.dircache,DirCache,0,9,0,0,0,1,0,1,0,1
-Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.File,0,70,0,8,0,18,0,9,0,5
+Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.File,0,92,0,8,0,19,0,9,0,5
 Dir Cache,uk.co.spudsoft.dircache,AbstractTree,0,3,0,0,0,1,0,1,0,1
 Dir Cache,uk.co.spudsoft.dircache,DirCacheTree.Directory,1,192,2,16,0,47,2,21,0,14
 Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.Visitor,17,202,1,9,4,33,2,12,1,8
 Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.PathAndNodeList,0,19,0,0,0,7,0,2,0,2
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl,27,366,3,49,12,107,4,34,1,11
-Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.PollTask,0,31,0,4,0,7,0,4,0,2
+Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl,25,381,3,53,11,109,4,36,1,11
+Dir Cache,uk.co.spudsoft.dircache.impl,DirCacheImpl.PollTask,0,20,0,4,0,5,0,4,0,2
