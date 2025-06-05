@@ -359,7 +359,7 @@ public class DirCacheImpl implements DirCache {
   private boolean walk(String reason) {
 <span class="fc" id="L360">    Visitor visitor = new Visitor();</span>
 <span class="fc" id="L361">    LocalDateTime walkTime = LocalDateTime.now();</span>
-<span class="fc" id="L362">    logger.debug(&quot;Scanning file tree for {}&quot;, reason);</span>
+<span class="fc" id="L362">    logger.trace(&quot;Scanning file tree for {}&quot;, reason);</span>
 <span class="fc" id="L363">    boolean changed = false;</span>
 <span class="fc" id="L364">    synchronized (scanLock) {</span>
       try {
