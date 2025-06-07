@@ -119,12 +119,8 @@ public class DirCacheImpl implements DirCache {
   private class PollTask extends TimerTask {
 
     @Override
-    public void run() {      
-      if (walk("poll")) {
-        if (callback != null) {
-          callback.run();
-        }
-      }
+    public void run() {
+      walkWithCallback("poll");
     }
     
   }
@@ -134,7 +130,7 @@ public class DirCacheImpl implements DirCache {
     logger.info("Starting DirCache of {}", rootPath);
     stopped.set(false);
     watcher = FileSystems.getDefault().newWatchService();
-    walk("initialization");
+    walkWithCallback("initialization");
     if (stabilizationgLagMillis >= 0) {
       thread = new Thread(this::thread, "DirCache#watch: " + rootPath.toString());
       thread.start();
@@ -353,7 +349,7 @@ public class DirCacheImpl implements DirCache {
 
   @Override
   public void refresh() {
-    walk("manual refresh");
+    walkWithCallback("manual refresh");
   }
   
   private boolean walk(String reason) {
@@ -384,6 +380,15 @@ public class DirCacheImpl implements DirCache {
         }
       }
       return changed;
+    }
+  }
+  
+  private void walkWithCallback(String reason) {
+    if (walk(reason)) {
+      Runnable cb = callback;
+      if (cb != null) {
+        cb.run();
+      }
     }
   }
 
