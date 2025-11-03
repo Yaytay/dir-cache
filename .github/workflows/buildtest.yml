@@ -60,7 +60,8 @@ jobs:
     - name: Tidy up old package versions
       uses: actions/delete-package-versions@v5
       with: 
-        package-name: 'uk.co.spudsoft.dircache'
+        package-name: 'uk.co.spudsoft.dir-cache'
+        package-type: maven
         min-versions-to-keep: 10
         delete-only-pre-release-versions: "true" 
                 
