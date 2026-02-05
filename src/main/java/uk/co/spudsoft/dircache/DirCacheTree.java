@@ -41,9 +41,20 @@ public class DirCacheTree extends AbstractTree {
   private DirCacheTree() {
   }
   
+  /**
+   * The type of a Node, whether it represents a file or a directory.
+   */
   public enum NodeType {
+    /**
+     * The Node is a file.
+     */
     file
-    , dir
+    , 
+    /**
+     * The Node is a directory, with children.
+     * Note that empty directories should be stripped out, so a directory always has children.
+     */
+    dir
   }
   
   public abstract static class Node extends AbstractNode<Node> {
@@ -125,6 +136,11 @@ public class DirCacheTree extends AbstractTree {
       this.children.forEach(n -> childrenByName.put(n.getName(), n));
     }
 
+    /**
+     * Get the discriminator to aid in polymorphic deserialization.
+     * Always returns NodeType.dir.
+     * @return NodeType.dir.
+     */
     @Override
     public NodeType getType() {
       return NodeType.dir;
@@ -272,6 +288,11 @@ public class DirCacheTree extends AbstractTree {
       this.size = size;
     }
 
+    /**
+     * Get the discriminator to aid in polymorphic deserialization.
+     * Always returns NodeType.file.
+     * @return NodeType.file.
+     */
     @Override
     public NodeType getType() {
       return NodeType.file;
