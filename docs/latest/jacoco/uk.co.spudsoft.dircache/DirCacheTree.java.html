@@ -41,28 +41,50 @@ public class DirCacheTree extends AbstractTree {
   private DirCacheTree() {
   }
   
-  public static class Node extends AbstractNode&lt;Node&gt; {
+  /**
+   * The type of a Node, whether it represents a file or a directory.
+   */
+<span class="fc" id="L47">  public enum NodeType {</span>
+    /**
+     * The Node is a file.
+     */
+<span class="fc" id="L51">    file</span>
+    , 
+    /**
+     * The Node is a directory, with children.
+     * Note that empty directories should be stripped out, so a directory always has children.
+     */
+<span class="fc" id="L57">    dir</span>
+  }
+  
+  public abstract static class Node extends AbstractNode&lt;Node&gt; {
     protected final Path path;
     protected final LocalDateTime modified;
 
     public Node(Path path, LocalDateTime modified) {
-<span class="fc" id="L49">      super(path.getFileName().toString());</span>
-<span class="fc" id="L50">      this.path = path;</span>
-<span class="fc" id="L51">      this.modified = modified;</span>
-<span class="fc" id="L52">    }</span>
+<span class="fc" id="L65">      super(path.getFileName().toString());</span>
+<span class="fc" id="L66">      this.path = path;</span>
+<span class="fc" id="L67">      this.modified = modified;</span>
+<span class="fc" id="L68">    }</span>
 
     public Node(Path path, LocalDateTime modified, List&lt;Node&gt; children) {
-<span class="fc" id="L55">      super(path.getFileName().toString(), children);</span>
-<span class="fc" id="L56">      this.path = path;</span>
-<span class="fc" id="L57">      this.modified = modified;</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L71">      super(path.getFileName().toString(), children);</span>
+<span class="fc" id="L72">      this.path = path;</span>
+<span class="fc" id="L73">      this.modified = modified;</span>
+<span class="fc" id="L74">    }</span>
 
+    /**
+     * Return the type of the node, discriminator for polymorphic deserialization.
+     * @return the type of the node.
+     */
+    public abstract NodeType getType();
+    
     /**
      * Get the {@link java.nio.file.Path} that relates to this Node.
      * @return the {@link java.nio.file.Path} that relates to this Node.
      */
     public Path getPath() {
-<span class="fc" id="L65">      return path;</span>
+<span class="fc" id="L87">      return path;</span>
     }
 
     /**
@@ -70,30 +92,30 @@ public class DirCacheTree extends AbstractTree {
      * @return the modified timestamp.
      */
     public LocalDateTime getModified() {
-<span class="fc" id="L73">      return modified;</span>
+<span class="fc" id="L95">      return modified;</span>
     }
 
     protected int privateMembersHashCode() {
-<span class="fc" id="L77">      int hash = 5;</span>
-<span class="fc" id="L78">      hash = 23 * hash + Objects.hashCode(this.path);</span>
-<span class="fc" id="L79">      hash = 23 * hash + Objects.hashCode(this.modified);</span>
-<span class="fc" id="L80">      hash = 23 * hash + Objects.hashCode(this.name);</span>
-<span class="fc" id="L81">      hash = 23 * hash + Objects.hashCode(this.children);</span>
-<span class="fc" id="L82">      return hash;</span>
+<span class="fc" id="L99">      int hash = 5;</span>
+<span class="fc" id="L100">      hash = 23 * hash + Objects.hashCode(this.path);</span>
+<span class="fc" id="L101">      hash = 23 * hash + Objects.hashCode(this.modified);</span>
+<span class="fc" id="L102">      hash = 23 * hash + Objects.hashCode(this.name);</span>
+<span class="fc" id="L103">      hash = 23 * hash + Objects.hashCode(this.children);</span>
+<span class="fc" id="L104">      return hash;</span>
     }
 
     protected boolean privateMembersEqual(final Node other) {
-<span class="fc bfc" id="L86" title="All 2 branches covered.">      if (!Objects.equals(this.name, other.name)) {</span>
-<span class="fc" id="L87">        return false;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">      if (!Objects.equals(this.name, other.name)) {</span>
+<span class="fc" id="L109">        return false;</span>
       }
-<span class="pc bpc" id="L89" title="1 of 2 branches missed.">      if (!Objects.equals(this.path, other.path)) {</span>
-<span class="nc" id="L90">        return false;</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">      if (!Objects.equals(this.path, other.path)) {</span>
+<span class="nc" id="L112">        return false;</span>
       }
-<span class="fc bfc" id="L92" title="All 2 branches covered.">      if (!Objects.equals(this.modified, other.modified)) {</span>
-<span class="fc" id="L93">        logger.debug(&quot;{} changed at {}&quot;, this.path, this.modified);</span>
-<span class="fc" id="L94">        return false;</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">      if (!Objects.equals(this.modified, other.modified)) {</span>
+<span class="fc" id="L115">        logger.debug(&quot;{} changed at {}&quot;, this.path, this.modified);</span>
+<span class="fc" id="L116">        return false;</span>
       }
-<span class="fc" id="L96">      return Objects.equals(this.children, other.children);</span>
+<span class="fc" id="L118">      return Objects.equals(this.children, other.children);</span>
     }
     
   }
@@ -109,11 +131,21 @@ public class DirCacheTree extends AbstractTree {
      * @param children The children of the Directory - in the order returned by FileWalker (which will be dirs first, then probably sorted by name).
      */
     public Directory(Path path, LocalDateTime modified, List&lt;Node&gt; children) {
-<span class="fc" id="L112">      super(path, modified, List.copyOf(children));</span>
-<span class="fc" id="L113">      this.childrenByName = new HashMap&lt;&gt;(children.size() * 2);</span>
-<span class="fc" id="L114">      this.children.forEach(n -&gt; childrenByName.put(n.getName(), n));</span>
-<span class="fc" id="L115">    }</span>
+<span class="fc" id="L134">      super(path, modified, List.copyOf(children));</span>
+<span class="fc" id="L135">      this.childrenByName = new HashMap&lt;&gt;(children.size() * 2);</span>
+<span class="fc" id="L136">      this.children.forEach(n -&gt; childrenByName.put(n.getName(), n));</span>
+<span class="fc" id="L137">    }</span>
 
+    /**
+     * Get the discriminator to aid in polymorphic deserialization.
+     * Always returns NodeType.dir.
+     * @return NodeType.dir.
+     */
+    @Override
+    public NodeType getType() {
+<span class="fc" id="L146">      return NodeType.dir;</span>
+    }
+    
     /**
      * Get the children of the Directory.
      * @return the children of the Directory.
@@ -121,7 +153,7 @@ public class DirCacheTree extends AbstractTree {
     @Override
     @NotNull
     public List&lt;Node&gt; getChildren() {
-<span class="fc" id="L124">      return children;</span>
+<span class="fc" id="L156">      return children;</span>
     }
 
     /**
@@ -130,7 +162,7 @@ public class DirCacheTree extends AbstractTree {
      * @return The child Node, or null if the child is not known.
      */
     public Node get(String name) {
-<span class="fc" id="L133">      return childrenByName.get(name);</span>
+<span class="fc" id="L165">      return childrenByName.get(name);</span>
     }    
 
     /**
@@ -139,11 +171,11 @@ public class DirCacheTree extends AbstractTree {
      * @return The child Directory, or null if the child is not known or is not a directory.
      */
     public Directory getDir(String name) {
-<span class="fc" id="L142">      Node child = childrenByName.get(name);</span>
-<span class="fc bfc" id="L143" title="All 2 branches covered.">      if (child instanceof Directory) {</span>
-<span class="fc" id="L144">        return (Directory) child;</span>
+<span class="fc" id="L174">      Node child = childrenByName.get(name);</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">      if (child instanceof Directory) {</span>
+<span class="fc" id="L176">        return (Directory) child;</span>
       } else {
-<span class="fc" id="L146">        return null;</span>
+<span class="fc" id="L178">        return null;</span>
       }
     }
 
@@ -164,35 +196,35 @@ public class DirCacheTree extends AbstractTree {
             BiFunction&lt;Directory, List&lt;N&gt;, D&gt; dirMapper
             , Function&lt;File, N&gt; fileMapper
     ) {
-<span class="fc" id="L167">      List&lt;N&gt; mappedChildren = children.stream().map(n -&gt; {</span>
-<span class="fc bfc" id="L168" title="All 2 branches covered.">                if (n instanceof File) {</span>
-<span class="fc" id="L169">                  File f = (File) n;</span>
-<span class="fc" id="L170">                  return fileMapper.apply(f);</span>
+<span class="fc" id="L199">      List&lt;N&gt; mappedChildren = children.stream().map(n -&gt; {</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">                if (n instanceof File) {</span>
+<span class="fc" id="L201">                  File f = (File) n;</span>
+<span class="fc" id="L202">                  return fileMapper.apply(f);</span>
                 } else {
-<span class="fc" id="L172">                  Directory d = (Directory) n;</span>
-<span class="fc" id="L173">                  return d.map(dirMapper, fileMapper);</span>
+<span class="fc" id="L204">                  Directory d = (Directory) n;</span>
+<span class="fc" id="L205">                  return d.map(dirMapper, fileMapper);</span>
                 }
               })
-<span class="pc bpc" id="L176" title="1 of 2 branches missed.">              .filter(n -&gt; n != null)</span>
-<span class="fc" id="L177">              .collect(Collectors.toList());</span>
+<span class="pc bpc" id="L208" title="1 of 2 branches missed.">              .filter(n -&gt; n != null)</span>
+<span class="fc" id="L209">              .collect(Collectors.toList());</span>
       
-<span class="fc" id="L179">      return dirMapper.apply(this, mappedChildren);</span>
+<span class="fc" id="L211">      return dirMapper.apply(this, mappedChildren);</span>
     }
     
     private &lt;F&gt; void flatten(List&lt;F&gt; mapped, Function&lt;File, F&gt; mapper) {
-<span class="fc" id="L183">      children.forEach(n -&gt; {</span>
-<span class="fc bfc" id="L184" title="All 2 branches covered.">        if (n instanceof File) {</span>
-<span class="fc" id="L185">          File f = (File) n;</span>
-<span class="fc" id="L186">          F mappedFile = mapper.apply(f);</span>
-<span class="pc bpc" id="L187" title="1 of 2 branches missed.">          if (mappedFile != null) {</span>
-<span class="fc" id="L188">            mapped.add(mappedFile);</span>
+<span class="fc" id="L215">      children.forEach(n -&gt; {</span>
+<span class="fc bfc" id="L216" title="All 2 branches covered.">        if (n instanceof File) {</span>
+<span class="fc" id="L217">          File f = (File) n;</span>
+<span class="fc" id="L218">          F mappedFile = mapper.apply(f);</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">          if (mappedFile != null) {</span>
+<span class="fc" id="L220">            mapped.add(mappedFile);</span>
           }
-<span class="fc" id="L190">        } else {</span>
-<span class="fc" id="L191">          Directory d = (Directory) n;</span>
-<span class="fc" id="L192">          d.flatten(mapped, mapper);</span>
+<span class="fc" id="L222">        } else {</span>
+<span class="fc" id="L223">          Directory d = (Directory) n;</span>
+<span class="fc" id="L224">          d.flatten(mapped, mapper);</span>
         }
-<span class="fc" id="L194">      });</span>
-<span class="fc" id="L195">    }</span>
+<span class="fc" id="L226">      });</span>
+<span class="fc" id="L227">    }</span>
     
     /**
      * Map all the Files in this Directory and all its children (recursively) into a List of individually mapped items.
@@ -202,41 +234,41 @@ public class DirCacheTree extends AbstractTree {
      * @return The result of called dirMapper on this Directory with all of its children mapped.
     */
     public &lt;F&gt; List&lt;F&gt; flatten(Function&lt;File, F&gt; fileMapper) {
-<span class="fc" id="L205">      List&lt;F&gt; mappedChildren = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L206">      Directory.this.flatten(mappedChildren, fileMapper);</span>
-<span class="fc" id="L207">      return mappedChildren;</span>
+<span class="fc" id="L237">      List&lt;F&gt; mappedChildren = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L238">      Directory.this.flatten(mappedChildren, fileMapper);</span>
+<span class="fc" id="L239">      return mappedChildren;</span>
     }
     
     @Override
     public int hashCode() {
-<span class="fc" id="L212">      int hash = super.privateMembersHashCode();</span>
-<span class="fc" id="L213">      hash = 89 * hash + Objects.hashCode(this.children);</span>
-<span class="fc" id="L214">      return hash;</span>
+<span class="fc" id="L244">      int hash = super.privateMembersHashCode();</span>
+<span class="fc" id="L245">      hash = 89 * hash + Objects.hashCode(this.children);</span>
+<span class="fc" id="L246">      return hash;</span>
     }
 
     @Override
     public boolean equals(Object obj) {
-<span class="fc bfc" id="L219" title="All 2 branches covered.">      if (this == obj) {</span>
-<span class="fc" id="L220">        return true;</span>
+<span class="fc bfc" id="L251" title="All 2 branches covered.">      if (this == obj) {</span>
+<span class="fc" id="L252">        return true;</span>
       }
-<span class="fc bfc" id="L222" title="All 2 branches covered.">      if (obj == null) {</span>
-<span class="fc" id="L223">        return false;</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">      if (obj == null) {</span>
+<span class="fc" id="L255">        return false;</span>
       }
-<span class="fc bfc" id="L225" title="All 2 branches covered.">      if (getClass() != obj.getClass()) {</span>
-<span class="fc" id="L226">        return false;</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">      if (getClass() != obj.getClass()) {</span>
+<span class="fc" id="L258">        return false;</span>
       }
-<span class="fc" id="L228">      final Directory other = (Directory) obj;</span>
-<span class="fc bfc" id="L229" title="All 2 branches covered.">      if (!super.privateMembersEqual(other)) {</span>
-<span class="fc" id="L230">        return false;</span>
+<span class="fc" id="L260">      final Directory other = (Directory) obj;</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">      if (!super.privateMembersEqual(other)) {</span>
+<span class="fc" id="L262">        return false;</span>
       }
       
-<span class="fc" id="L233">      return Objects.equals(this.children, other.children);</span>
+<span class="fc" id="L265">      return Objects.equals(this.children, other.children);</span>
     }
     
 
     @Override
     public String toString() {
-<span class="fc" id="L239">      return path + &quot; (&quot; + children.size() + &quot; children @ &quot; + modified + ')';</span>
+<span class="fc" id="L271">      return path + &quot; (&quot; + children.size() + &quot; children @ &quot; + modified + ')';</span>
     }
     
   }
@@ -252,47 +284,57 @@ public class DirCacheTree extends AbstractTree {
      * @param size The size of the file, in bytes.
      */
     public File(Path path, LocalDateTime modified, long size) {
-<span class="fc" id="L255">      super(path, modified);</span>
-<span class="fc" id="L256">      this.size = size;</span>
-<span class="fc" id="L257">    }</span>
-    
+<span class="fc" id="L287">      super(path, modified);</span>
+<span class="fc" id="L288">      this.size = size;</span>
+<span class="fc" id="L289">    }</span>
+
+    /**
+     * Get the discriminator to aid in polymorphic deserialization.
+     * Always returns NodeType.file.
+     * @return NodeType.file.
+     */
+    @Override
+    public NodeType getType() {
+<span class="fc" id="L298">      return NodeType.file;</span>
+    }
+
     /**
      * Get the size of the file on disc, in bytes.
      * @return the size of the file on disc, in bytes.
      */
     public long getSize() {
-<span class="fc" id="L264">      return size;</span>
+<span class="fc" id="L306">      return size;</span>
     }
 
     @Override
     public int hashCode() {
-<span class="fc" id="L269">      int hash = super.privateMembersHashCode();</span>
-<span class="fc" id="L270">      hash = 23 * hash + (int) (this.size ^ (this.size &gt;&gt;&gt; 32));</span>
-<span class="fc" id="L271">      return hash;</span>
+<span class="fc" id="L311">      int hash = super.privateMembersHashCode();</span>
+<span class="fc" id="L312">      hash = 23 * hash + (int) (this.size ^ (this.size &gt;&gt;&gt; 32));</span>
+<span class="fc" id="L313">      return hash;</span>
     }
 
     @Override
     public boolean equals(Object obj) {
-<span class="fc bfc" id="L276" title="All 2 branches covered.">      if (this == obj) {</span>
-<span class="fc" id="L277">        return true;</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">      if (this == obj) {</span>
+<span class="fc" id="L319">        return true;</span>
       }
-<span class="fc bfc" id="L279" title="All 2 branches covered.">      if (obj == null) {</span>
-<span class="fc" id="L280">        return false;</span>
+<span class="fc bfc" id="L321" title="All 2 branches covered.">      if (obj == null) {</span>
+<span class="fc" id="L322">        return false;</span>
       }
-<span class="fc bfc" id="L282" title="All 2 branches covered.">      if (getClass() != obj.getClass()) {</span>
-<span class="fc" id="L283">        return false;</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">      if (getClass() != obj.getClass()) {</span>
+<span class="fc" id="L325">        return false;</span>
       }
-<span class="fc" id="L285">      final File other = (File) obj;</span>
-<span class="fc bfc" id="L286" title="All 2 branches covered.">      if (this.size != other.size) {</span>
-<span class="fc" id="L287">        logger.debug(&quot;{} changed size from {} to {}&quot;, this.path, other.size, this.size);</span>
-<span class="fc" id="L288">        return false;</span>
+<span class="fc" id="L327">      final File other = (File) obj;</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">      if (this.size != other.size) {</span>
+<span class="fc" id="L329">        logger.debug(&quot;{} changed size from {} to {}&quot;, this.path, other.size, this.size);</span>
+<span class="fc" id="L330">        return false;</span>
       }
-<span class="fc" id="L290">      return super.privateMembersEqual(other);</span>
+<span class="fc" id="L332">      return super.privateMembersEqual(other);</span>
     }
 
     @Override
     public String toString() {
-<span class="fc" id="L295">      return path + &quot; (&quot; + size + &quot; bytes @ &quot; + modified + ')';</span>
+<span class="fc" id="L337">      return path + &quot; (&quot; + size + &quot; bytes @ &quot; + modified + ')';</span>
     }
   }
   
