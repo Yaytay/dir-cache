@@ -38,7 +38,15 @@ public class AbstractTreeTest {
       public Node(String name, List<Node> children) {
         super(name, children);
       }
-      
+
+      @Override
+      public NodeType getType() {
+        if (super.getChildren() != null) {
+          return NodeType.dir;
+        } else {
+          return NodeType.file;
+        }
+      }
     }
     
   }

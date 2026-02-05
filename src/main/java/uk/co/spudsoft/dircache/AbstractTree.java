@@ -37,6 +37,22 @@ import java.util.List;
 public abstract class AbstractTree implements FileTree {
 
   /**
+   * The type of a Node, whether it represents a file or a directory.
+   */
+  public enum NodeType {
+    /**
+     * The Node is a file.
+     */
+    file
+    , 
+    /**
+     * The Node is a directory, with children.
+     * Note that empty directories should be stripped out, so a directory always has children.
+     */
+    dir
+  }
+    
+  /**
    * Every node in the tree is an AbstractNode.
    * @param <N> The derived Node type to be used in the specific implementation.
    */
@@ -72,6 +88,13 @@ public abstract class AbstractTree implements FileTree {
       this.children = null;
     }
 
+    /**
+     * Return the type of the node, discriminator for polymorphic de-serialization.
+     * @return the type of the node.
+     */
+    @NotNull
+    public abstract NodeType getType();
+    
     /**
      * Get the name of the directory entry.
      * @return the name of the directory entry.

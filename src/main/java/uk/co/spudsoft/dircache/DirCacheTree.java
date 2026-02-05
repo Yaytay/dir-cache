@@ -41,22 +41,6 @@ public class DirCacheTree extends AbstractTree {
   private DirCacheTree() {
   }
   
-  /**
-   * The type of a Node, whether it represents a file or a directory.
-   */
-  public enum NodeType {
-    /**
-     * The Node is a file.
-     */
-    file
-    , 
-    /**
-     * The Node is a directory, with children.
-     * Note that empty directories should be stripped out, so a directory always has children.
-     */
-    dir
-  }
-  
   public abstract static class Node extends AbstractNode<Node> {
     protected final Path path;
     protected final LocalDateTime modified;
@@ -73,12 +57,6 @@ public class DirCacheTree extends AbstractTree {
       this.modified = modified;
     }
 
-    /**
-     * Return the type of the node, discriminator for polymorphic deserialization.
-     * @return the type of the node.
-     */
-    public abstract NodeType getType();
-    
     /**
      * Get the {@link java.nio.file.Path} that relates to this Node.
      * @return the {@link java.nio.file.Path} that relates to this Node.

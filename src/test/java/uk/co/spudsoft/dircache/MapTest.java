@@ -49,6 +49,15 @@ public class MapTest {
         this.path = path;
       }
       
+      @Override
+      public NodeType getType() {
+        if (super.getChildren() != null) {
+          return NodeType.dir;
+        } else {
+          return NodeType.file;
+        }
+      }
+
       public String getPath() {
         return path;
       }
