@@ -37,10 +37,26 @@ import java.util.List;
 <span class="fc" id="L37">public abstract class AbstractTree implements FileTree {</span>
 
   /**
+   * The type of a Node, whether it represents a file or a directory.
+   */
+<span class="fc" id="L42">  public enum NodeType {</span>
+    /**
+     * The Node is a file.
+     */
+<span class="fc" id="L46">    file</span>
+    , 
+    /**
+     * The Node is a directory, with children.
+     * Note that empty directories should be stripped out, so a directory always has children.
+     */
+<span class="fc" id="L52">    dir</span>
+  }
+    
+  /**
    * Every node in the tree is an AbstractNode.
    * @param &lt;N&gt; The derived Node type to be used in the specific implementation.
    */
-<span class="fc" id="L43">  public abstract static class AbstractNode&lt;N extends AbstractNode&lt;?&gt;&gt; implements FileTree.FileTreeNode&lt;N&gt; {</span>
+<span class="fc" id="L59">  public abstract static class AbstractNode&lt;N extends AbstractNode&lt;?&gt;&gt; implements FileTree.FileTreeNode&lt;N&gt; {</span>
     protected final String name;
     protected final List&lt;N&gt; children;
 
@@ -52,12 +68,12 @@ import java.util.List;
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      * The children should be null for a leaf node, and not-null (though possibly empty) for an internal node.
      */
-<span class="fc" id="L55">    public AbstractNode(@NotNull String name, @NotNull List&lt;N&gt; children) {</span>
-<span class="fc bfc" id="L56" title="All 2 branches covered.">      assert name != null;</span>
-<span class="fc bfc" id="L57" title="All 2 branches covered.">      assert children != null;</span>
-<span class="fc" id="L58">      this.name = name;</span>
-<span class="fc" id="L59">      this.children = children;</span>
-<span class="fc" id="L60">    }</span>
+<span class="fc" id="L71">    public AbstractNode(@NotNull String name, @NotNull List&lt;N&gt; children) {</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">      assert name != null;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">      assert children != null;</span>
+<span class="fc" id="L74">      this.name = name;</span>
+<span class="fc" id="L75">      this.children = children;</span>
+<span class="fc" id="L76">    }</span>
 
     /**
      * Leaf node constructor.
@@ -65,13 +81,20 @@ import java.util.List;
      * @param name The name of the node.  The name of a leaf node may not be empty.
      * All nodes have a name and all nodes except the root node should have a non-zero length name.
      */
-<span class="fc" id="L68">    public AbstractNode(@NotNull String name) {</span>
-<span class="fc bfc" id="L69" title="All 2 branches covered.">      assert name != null;</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
-<span class="fc" id="L71">      this.name = name;</span>
-<span class="fc" id="L72">      this.children = null;</span>
-<span class="fc" id="L73">    }</span>
+<span class="fc" id="L84">    public AbstractNode(@NotNull String name) {</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">      assert name != null;</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">      assert name.length() &gt; 0;</span>
+<span class="fc" id="L87">      this.name = name;</span>
+<span class="fc" id="L88">      this.children = null;</span>
+<span class="fc" id="L89">    }</span>
 
+    /**
+     * Return the type of the node, discriminator for polymorphic de-serialization.
+     * @return the type of the node.
+     */
+    @NotNull
+    public abstract NodeType getType();
+    
     /**
      * Get the name of the directory entry.
      * @return the name of the directory entry.
@@ -79,7 +102,7 @@ import java.util.List;
     @Override
     @NotNull
     public String getName() {
-<span class="fc" id="L82">      return name;</span>
+<span class="fc" id="L105">      return name;</span>
     }
 
     /**
@@ -88,7 +111,7 @@ import java.util.List;
      */
     @Override
     public List&lt;N&gt; getChildren() {
-<span class="fc" id="L91">      return children;</span>
+<span class="fc" id="L114">      return children;</span>
     }
     
     /**
@@ -100,7 +123,7 @@ import java.util.List;
      */
     @Override
     public boolean leaf() {
-<span class="fc bfc" id="L103" title="All 2 branches covered.">      return children == null;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      return children == null;</span>
     }
   }
 

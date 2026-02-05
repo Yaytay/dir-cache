@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites failures="0" name="dependency-check" tests="2">
-        <testsuite failures="0" errors="0" time="0" id="0" name="/home/runner/.m2/repository/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" package="jakarta.validation-api-3.1.1.jar" skipped="0" tests="1" timestamp="2026-02-05T10:50:37.90558858">
+        <testsuite failures="0" errors="0" time="0" id="0" name="/home/runner/.m2/repository/jakarta/validation/jakarta.validation-api/3.1.1/jakarta.validation-api-3.1.1.jar" package="jakarta.validation-api-3.1.1.jar" skipped="0" tests="1" timestamp="2026-02-05T13:57:42.294472991">
             <testcase classname="dependency-check" name="jakarta.validation-api-3.1.1.jar"/>
     </testsuite>
-        <testsuite failures="0" errors="0" time="0" id="1" name="/home/runner/.m2/repository/org/slf4j/slf4j-api/2.1.0-alpha1/slf4j-api-2.1.0-alpha1.jar" package="slf4j-api-2.1.0-alpha1.jar" skipped="0" tests="1" timestamp="2026-02-05T10:50:37.90558858">
+        <testsuite failures="0" errors="0" time="0" id="1" name="/home/runner/.m2/repository/org/slf4j/slf4j-api/2.1.0-alpha1/slf4j-api-2.1.0-alpha1.jar" package="slf4j-api-2.1.0-alpha1.jar" skipped="0" tests="1" timestamp="2026-02-05T13:57:42.294472991">
             <testcase classname="dependency-check" name="slf4j-api-2.1.0-alpha1.jar"/>
     </testsuite>
 </testsuites>

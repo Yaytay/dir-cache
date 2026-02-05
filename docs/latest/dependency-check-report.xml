@@ -4,19 +4,19 @@
         <engineVersion>12.2.0</engineVersion>
         <dataSource>
             <name>NVD API Last Checked</name>
-            <timestamp>2026-02-05T10:50:28Z</timestamp>
+            <timestamp>2026-02-05T13:57:20Z</timestamp>
         </dataSource>
         <dataSource>
             <name>NVD API Last Modified</name>
-            <timestamp>2026-02-05T10:16:03Z</timestamp>
+            <timestamp>2026-02-05T13:29:34Z</timestamp>
         </dataSource>
     </scanInfo>
     <projectInfo>
         <name>Dir Cache</name>
         <groupID>uk.co.spudsoft</groupID>
         <artifactID>dir-cache</artifactID>
-        <version>0.0.34</version>
-        <reportDate>2026-02-05T10:50:37.905588580Z</reportDate>
+        <version>0.0.35</version>
+        <reportDate>2026-02-05T13:57:42.294472991Z</reportDate>
         <credits>This product uses the NVD API but is not endorsed or certified by the NVD. This report contains data retrieved from the National Vulnerability Database: https://nvd.nist.gov, Github Advisory Database (via NPM Audit API): https://github.com/advisories/, and the RetireJS community.</credits>
     </projectInfo>
     <dependencies>
@@ -34,7 +34,7 @@
                 <projectReference>Dir Cache:provided</projectReference>
             </projectReferences>
             <includedBy>
-                <reference>pkg:maven/uk.co.spudsoft/dir-cache@0.0.34</reference>
+                <reference>pkg:maven/uk.co.spudsoft/dir-cache@0.0.35</reference>
             </includedBy>
             <evidenceCollected>
                 <evidence type="vendor" confidence="HIGH">
@@ -346,7 +346,7 @@
                 <projectReference>Dir Cache:compile</projectReference>
             </projectReferences>
             <includedBy>
-                <reference>pkg:maven/uk.co.spudsoft/dir-cache@0.0.34</reference>
+                <reference>pkg:maven/uk.co.spudsoft/dir-cache@0.0.35</reference>
             </includedBy>
             <evidenceCollected>
                 <evidence type="vendor" confidence="HIGH">
