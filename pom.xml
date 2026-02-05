@@ -579,22 +579,7 @@
             </reports>
           </reportSet>
         </reportSets>
-      </plugin>      /**
-     * Get the relative path to the node from the root.
-     * @return the relative path to the node from the root.
-     */
-    @NotNull
-    @Schema(description = """
-                          <P>
-                          The relative path to the node from the root.
-                          </P>
-                          """
-          , maxLength = 1000
-    )
-    public String getPath() {
-      return path;
-    }
-
+      </plugin>  
           
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
