@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileTree.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Dir Cache</a> &gt; <a href="index.source.html" class="el_package">uk.co.spudsoft.dircache</a> &gt; <span class="el_source">FileTree.java</span></div><h1>FileTree.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2023 njt
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ */
+package uk.co.spudsoft.dircache;
+
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * A generic representation of a hierarchical file tree.
+ *
+ * &lt;p&gt;
+ * This interface does not prescribe how nodes are stored or loaded; instead, it defines the recursive type relationships between:
+ *
+ * &lt;ul&gt;
+ * &lt;li&gt;{@code N} – the concrete node type used by this tree&lt;/li&gt;
+ * &lt;li&gt;{@code D} – the concrete directory type used by this tree&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * Implementations bind these type parameters so that directory nodes return children of the correct implementation-specific type.
+ *
+ * @param &lt;N&gt; the concrete node type for this tree
+ */
+public interface FileTree&lt;N extends FileTree.FileTreeNode&gt; {
+
+  /**
+   * The type of a Node, whether it represents a file or a directory.
+   */
+<span class="fc" id="L42">  enum NodeType {</span>
+    /**
+     * The Node is a file.
+     */
+<span class="fc" id="L46">    file,</span>
+    /**
+     * The Node is a directory, with children. Note that empty directories should be stripped out, so a directory always has
+     * children.
+     */
+<span class="fc" id="L51">    dir</span>
+  }
+
+  /**
+   * A node in a {@link FileTree}. Nodes may represent files, directories, or any other tree element defined by the
+   * implementation.
+   *
+   * &lt;p&gt;
+   * The type parameter {@code N} ensures that implementations can define their own node subtype while preserving type safety
+   * throughout the tree.
+   *
+   */
+  interface FileTreeNode {
+
+    /**
+     * Returns the name of this node as it appears in its parent directory.
+     *
+     * @return the name of the directory entry
+     */
+    @NotNull
+    String getName();
+
+    /**
+     * Return the type of the node, discriminator for polymorphic de-serialization.
+     * @return the type of the node.
+     */
+    @NotNull
+    NodeType getType();
+  }
+
+  /**
+   * A directory node within a {@link FileTree}. Directory nodes contain zero or more child nodes of the implementation-specific
+   * directory type.
+   *
+   * &lt;p&gt;
+   * The type parameters ensure that:
+   *
+   * &lt;ul&gt;
+   * &lt;li&gt;{@code N} is the node type used by this tree&lt;/li&gt;
+   * &lt;li&gt;{@code D} is the directory type used by this tree&lt;/li&gt;
+   * &lt;/ul&gt;
+   *
+   * This allows each {@code FileTree} implementation to define its own directory and node classes while preserving strong typing
+   * for {@link #getChildren()}.
+   *
+   * @param &lt;N&gt; the concrete node type
+   */
+  interface FileTreeDir&lt;N extends FileTreeNode&gt; extends FileTreeNode {
+
+    /**
+     * Returns the child directories of this directory node.
+     *
+     * &lt;p&gt;
+     * The returned list contains only directory nodes of the same implementation-specific type {@code D}. Implementations may
+     * choose whether the list is mutable, immutable, or lazily loaded.
+     *
+     * @return the list of child directory nodes
+     */
+    List&lt;N&gt; getChildren();
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

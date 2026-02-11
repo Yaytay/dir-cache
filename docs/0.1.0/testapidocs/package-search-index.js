@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"uk.co.spudsoft.dircache"},{"l":"uk.co.spudsoft.dircache.impl"}];updateSearchResults();
