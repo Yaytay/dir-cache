@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,7 +165,7 @@ public class DirCacheTree implements FileTree<DirCacheTree.Node> {
      * Either of the mapping methods may return null, which will not be included in the output structure.
      * This is the recommended approach if empty Directories are to be trimmed from the output.
      * 
-     * @param <MN> MappedNode, the subtype of {@link FileTreeNode> used for generic nodes in the mapped tree.
+     * @param <MN> MappedNode, the subtype of {@link FileTreeNode} used for generic nodes in the mapped tree.
      * @param dirMapper Method for mapping a Directory and it's already mapped children to a mapped Directory.
      * @param fileMapper Method for mapping a File to a mapped File.
      * @return The result of called dirMapper on this Directory with all of its children mapped.

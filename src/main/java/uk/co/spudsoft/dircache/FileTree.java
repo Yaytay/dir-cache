@@ -39,7 +39,7 @@ public interface FileTree<N extends FileTree.FileTreeNode> {
   /**
    * The type of a Node, whether it represents a file or a directory.
    */
-  public enum NodeType {
+  enum NodeType {
     /**
      * The Node is a file.
      */
@@ -75,7 +75,7 @@ public interface FileTree<N extends FileTree.FileTreeNode> {
      * @return the type of the node.
      */
     @NotNull
-    public abstract NodeType getType();
+    NodeType getType();
   }
 
   /**
@@ -94,7 +94,6 @@ public interface FileTree<N extends FileTree.FileTreeNode> {
    * for {@link #getChildren()}.
    *
    * @param <N> the concrete node type
-   * @param <D> the concrete directory type
    */
   interface FileTreeDir<N extends FileTreeNode> extends FileTreeNode {
 
