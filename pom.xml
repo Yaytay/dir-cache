@@ -37,7 +37,7 @@
   <properties>
     <forkCount>4</forkCount>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jdk.version>11</jdk.version>
+    <jdk.version>17</jdk.version>
     <jackson.version>[2.14,]</jackson.version>
     <slf4j.version>[1.7,)</slf4j.version>
     <logback.version>[1.2,)</logback.version>
@@ -148,8 +148,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.15.0</version>
           <configuration>
-            <source>${jdk.version}</source>
-            <target>${jdk.version}</target>
+            <source>17</source>
+            <target>17</target>
             <compilerArgs>
               <arg>-Xlint:all</arg>
               <arg>-proc:none</arg>
@@ -307,7 +307,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>13.1.0</version>
+            <version>13.2.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -440,7 +440,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.9.0</version>
+        <version>3.10.0</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>

@@ -22,6 +22,7 @@ import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,101 +32,139 @@ import org.slf4j.LoggerFactory;
  * @author jtalbut
  */
 public class MapTest {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(MapTest.class);
- 
-  private static class SimpleDirTree extends AbstractTree {
-    
-    public static class SimpleNode extends AbstractNode<SimpleNode> {
-      private final String path;
 
-      public SimpleNode(String path, String name) {
-        super(name);
-        this.path = path;
-      }
+  private static class SimpleNode implements FileTree.FileTreeNode {
+    private final String path;
+    private final String name;
+    private final FileTree.NodeType type;
 
-      public SimpleNode(String path, String name, List<SimpleNode> children) {
-        super(name, children);
-        this.path = path;
-      }
-      
-      @Override
-      public NodeType getType() {
-        if (super.getChildren() != null) {
-          return NodeType.dir;
-        } else {
-          return NodeType.file;
-        }
-      }
-
-      public String getPath() {
-        return path;
-      }
-            
+    SimpleNode(String path, String name, FileTree.NodeType type) {
+      this.path = path;
+      this.name = name;
+      this.type = type;
     }
-    
-    public static class SimpleFile extends SimpleNode {
-      private final int hour;
 
-      public SimpleFile(int hour, String path, String name) {
-        super(path, name);
-        this.hour = hour;
-      }
-
-      public int getHour() {
-        return hour;
-      }
-      
+    @Override
+    public String getName() {
+      return name;
     }
-    
-    public static class SimpleDirectory extends SimpleNode {
 
-      public SimpleDirectory(List<SimpleNode> children, String path, String name) {
-        super(path, name, children);
-      }
-      
-      public int getChildCount() {
-        return children.size();
-      }
-      
-    }    
-    
-  };
+    @Override
+    public FileTree.NodeType getType() {
+      return type;
+    }
 
-  
+    public String getPath() {
+      return path;
+    }
+  }
+
+  private static final class SimpleFile extends SimpleNode {
+    private final int hour;
+
+    SimpleFile(int hour, String path, String name) {
+      super(path, name, FileTree.NodeType.file);
+      this.hour = hour;
+    }
+
+    public int getHour() {
+      return hour;
+    }
+  }
+
+  private static final class SimpleDirectory extends SimpleNode implements FileTree.FileTreeDir<SimpleNode> {
+    private final List<SimpleNode> children;
+
+    SimpleDirectory(List<SimpleNode> children, String path, String name) {
+      super(path, name, FileTree.NodeType.dir);
+      this.children = children;
+    }
+
+    @Override
+    public List<SimpleNode> getChildren() {
+      return children;
+    }
+
+    public int getChildCount() {
+      return children.size();
+    }
+  }
+
   @Test
   public void testMapping() {
-    
-    LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 06, 10, 10);
-    DirCacheTree.Directory instance1 = new DirCacheTree.Directory(Path.of("firstDir"), ts, Arrays.asList(new DirCacheTree.File(Path.of("firstDir", "firstFirstFile"), ts, 1), new DirCacheTree.File(Path.of("firstDir", "firstSecondFile"), ts, 2)));
-    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(Path.of("secondDir"), ts, Arrays.asList(new DirCacheTree.File(Path.of("secondDir", "secondFirstFile"), ts, 1), new DirCacheTree.File(Path.of("secondDir", "secondSecondFile"), ts, 3)));
-    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(Path.of("thirdDir"), ts, Arrays.asList(new DirCacheTree.File(Path.of("thirdDir", "thirdFirstFile"), ts, 1), new DirCacheTree.File(Path.of("thirdDir", "thirdSecondFile"), ts, 2)));
-    DirCacheTree.File instance4 = new DirCacheTree.File(Path.of("fourth"), ts, 1);
-    DirCacheTree.Directory instance5 = new DirCacheTree.Directory(Path.of("fifthDir"), LocalDateTime.of(1971, Month.MAY, 06, 10, 11), Arrays.asList(new DirCacheTree.File(Path.of("fifthDir", "fifthFirstFile"), ts, 1), new DirCacheTree.File(Path.of("fifthDir", "fifthSecondFile"), ts, 2)));
 
-    DirCacheTree.Directory root = new DirCacheTree.Directory(Path.of("."), ts, Arrays.asList(instance1, instance2, instance3, instance4, instance5));
-    
-    SimpleDirTree.SimpleDirectory simpleRoot = root.<SimpleDirTree, SimpleDirTree.SimpleNode, SimpleDirTree.SimpleDirectory>map(
-            (d, l) -> {
-              Path p = d.getPath();
-              return new SimpleDirTree.SimpleDirectory(l, p.toString(), p.getFileName().toString());
-            }
-            , f -> {
-              return new SimpleDirTree.SimpleFile(f.getModified().getHour(), f.getPath().toString(), f.getName());
-            }
+    LocalDateTime ts = LocalDateTime.of(1971, Month.MAY, 6, 10, 10);
+
+    DirCacheTree.Directory instance1 = new DirCacheTree.Directory(
+            Path.of("firstDir"),
+            ts,
+            Arrays.asList(
+                    new DirCacheTree.File(Path.of("firstDir", "firstFirstFile"), ts, 1),
+                    new DirCacheTree.File(Path.of("firstDir", "firstSecondFile"), ts, 2)
+            )
     );
-    
+
+    DirCacheTree.Directory instance2 = new DirCacheTree.Directory(
+            Path.of("secondDir"),
+            ts,
+            Arrays.asList(
+                    new DirCacheTree.File(Path.of("secondDir", "secondFirstFile"), ts, 1),
+                    new DirCacheTree.File(Path.of("secondDir", "secondSecondFile"), ts, 3)
+            )
+    );
+
+    DirCacheTree.Directory instance3 = new DirCacheTree.Directory(
+            Path.of("thirdDir"),
+            ts,
+            Arrays.asList(
+                    new DirCacheTree.File(Path.of("thirdDir", "thirdFirstFile"), ts, 1),
+                    new DirCacheTree.File(Path.of("thirdDir", "thirdSecondFile"), ts, 2)
+            )
+    );
+
+    DirCacheTree.File instance4 = new DirCacheTree.File(Path.of("fourth"), ts, 1);
+
+    DirCacheTree.Directory instance5 = new DirCacheTree.Directory(
+            Path.of("fifthDir"),
+            LocalDateTime.of(1971, Month.MAY, 6, 10, 11),
+            Arrays.asList(
+                    new DirCacheTree.File(Path.of("fifthDir", "fifthFirstFile"), ts, 1),
+                    new DirCacheTree.File(Path.of("fifthDir", "fifthSecondFile"), ts, 2)
+            )
+    );
+
+    DirCacheTree.Directory root = new DirCacheTree.Directory(
+            Path.of("."),
+            ts,
+            Arrays.asList(instance1, instance2, instance3, instance4, instance5)
+    );
+
+    SimpleNode mappedRoot = root.<SimpleNode>map(
+            (d, children) -> {
+              Path p = d.getPath();
+              String name = p.getFileName() == null ? p.toString() : p.getFileName().toString();
+              return (SimpleNode) new SimpleDirectory(children, p.toString(), name);
+            },
+            f -> (SimpleNode) new SimpleFile(f.getModified().getHour(), f.getPath().toString(), f.getName())
+    );
+
+    SimpleDirectory simpleRoot = assertInstanceOf(SimpleDirectory.class, mappedRoot);
+
     logger.debug("DirCacheTree: {}", root);
-    for (DirCacheTree.Node node : root.children) {
+    for (DirCacheTree.Node node : root.getChildren()) {
       logger.debug("DirCacheTree.Node: {}", node);
     }
+
     logger.debug("SimpleDirTree: {}", simpleRoot);
-    for (SimpleDirTree.SimpleNode node : simpleRoot.children) {
+    for (SimpleNode node : simpleRoot.getChildren()) {
       logger.debug("SimpleDirTree.Node: {}", node);
     }
-    
-    List<String> names = root.flatten(f -> f.name);
+
+    List<String> names = root.flatten(DirCacheTree.Node::getName);
     logger.debug("Names: {}", names);
+
     assertEquals(9, names.size());
     assertEquals("firstFirstFile", names.get(0));
     assertEquals("firstSecondFile", names.get(1));
@@ -136,8 +175,5 @@ public class MapTest {
     assertEquals("fourth", names.get(6));
     assertEquals("fifthFirstFile", names.get(7));
     assertEquals("fifthSecondFile", names.get(8));
-    
   }
-  
-  
 }

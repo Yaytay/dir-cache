@@ -20,6 +20,8 @@ import jakarta.validation.constraints.NotNull;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,27 +36,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author jtalbut
  */
-public class DirCacheTree extends AbstractTree {
+public class DirCacheTree implements FileTree<DirCacheTree.Node> {
 
   private static final Logger logger = LoggerFactory.getLogger(DirCacheTree.class);
   
   private DirCacheTree() {
   }
   
-  public abstract static class Node extends AbstractNode<Node> {
+  public abstract static class Node implements FileTree.FileTreeNode {
+    protected final String name;
     protected final Path path;
     protected final LocalDateTime modified;
 
     public Node(Path path, LocalDateTime modified) {
-      super(path.getFileName().toString());
+      this.name = path.getFileName().toString();
       this.path = path;
       this.modified = modified;
     }
 
-    public Node(Path path, LocalDateTime modified, List<Node> children) {
-      super(path.getFileName().toString(), children);
-      this.path = path;
-      this.modified = modified;
+    @Override
+    public String getName() {
+      return name;
     }
 
     /**
@@ -78,7 +80,6 @@ public class DirCacheTree extends AbstractTree {
       hash = 23 * hash + Objects.hashCode(this.path);
       hash = 23 * hash + Objects.hashCode(this.modified);
       hash = 23 * hash + Objects.hashCode(this.name);
-      hash = 23 * hash + Objects.hashCode(this.children);
       return hash;
     }
 
@@ -93,13 +94,14 @@ public class DirCacheTree extends AbstractTree {
         logger.debug("{} changed at {}", this.path, this.modified);
         return false;
       }
-      return Objects.equals(this.children, other.children);
+      return true;
     }
     
   }
   
-  public static class Directory extends Node {
+  public static class Directory extends Node implements FileTree.FileTreeDir<Node> {
    
+    private final List<Node> children;
     private final Map<String, Node> childrenByName;
 
     /**
@@ -109,11 +111,12 @@ public class DirCacheTree extends AbstractTree {
      * @param children The children of the Directory - in the order returned by FileWalker (which will be dirs first, then probably sorted by name).
      */
     public Directory(Path path, LocalDateTime modified, List<Node> children) {
-      super(path, modified, List.copyOf(children));
+      super(path, modified);
+      this.children = Collections.unmodifiableList(children);
       this.childrenByName = new HashMap<>(children.size() * 2);
-      this.children.forEach(n -> childrenByName.put(n.getName(), n));
+      children.forEach(n -> childrenByName.put(n.getName(), n));
     }
-
+    
     /**
      * Get the discriminator to aid in polymorphic deserialization.
      * Always returns NodeType.dir.
@@ -158,23 +161,23 @@ public class DirCacheTree extends AbstractTree {
     }
 
     /**
-     * Map this Directory and all its children (recursively) into a different subclass of {@link AbstractTree}.
+     * Map this Directory and all its children (recursively) into a different implementation of {@link FileTree}.
      * 
      * Either of the mapping methods may return null, which will not be included in the output structure.
      * This is the recommended approach if empty Directories are to be trimmed from the output.
      * 
-     * @param <O> The type of the target AbstractTree.
-     * @param <N> The subtype of AbstractTree.AbstractNode used for generic nodes in the mapped tree.
-     * @param <D> The subtype of AbstractTree.AbstractNode used for internal nodes (directories) in the mapped tree.
+     * @param <MN> MappedNode, the subtype of {@link FileTreeNode> used for generic nodes in the mapped tree.
      * @param dirMapper Method for mapping a Directory and it's already mapped children to a mapped Directory.
      * @param fileMapper Method for mapping a File to a mapped File.
      * @return The result of called dirMapper on this Directory with all of its children mapped.
      */
-    public <O extends AbstractTree, N extends O.AbstractNode<N>, D extends N> D map(
-            BiFunction<Directory, List<N>, D> dirMapper
-            , Function<File, N> fileMapper
+    public <MN extends FileTree.FileTreeNode> MN map(
+            BiFunction<Directory, List<MN>, ? extends MN> dirMapper,
+            Function<File, ? extends MN> fileMapper
     ) {
-      List<N> mappedChildren = children.stream().map(n -> {
+      List<MN> mappedChildren = children
+              .stream()
+              .map(n -> {
                 if (n instanceof File) {
                   File f = (File) n;
                   return fileMapper.apply(f);
@@ -190,15 +193,13 @@ public class DirCacheTree extends AbstractTree {
     }
     
     private <F> void flatten(List<F> mapped, Function<File, F> mapper) {
-      children.forEach(n -> {
-        if (n instanceof File) {
-          File f = (File) n;
+      children.stream().forEach(node -> {
+        if (node instanceof File f) {
           F mappedFile = mapper.apply(f);
           if (mappedFile != null) {
             mapped.add(mappedFile);
           }
-        } else {
-          Directory d = (Directory) n;
+        } else if (node instanceof Directory d) {
           d.flatten(mapped, mapper);
         }
       });
@@ -220,7 +221,7 @@ public class DirCacheTree extends AbstractTree {
     @Override
     public int hashCode() {
       int hash = super.privateMembersHashCode();
-      hash = 89 * hash + Objects.hashCode(this.children);
+      hash = 89 * hash + Objects.hashCode(this.childrenByName);
       return hash;
     }
 
@@ -240,13 +241,13 @@ public class DirCacheTree extends AbstractTree {
         return false;
       }
       
-      return Objects.equals(this.children, other.children);
+      return Objects.equals(this.childrenByName, other.childrenByName);
     }
     
 
     @Override
     public String toString() {
-      return path + " (" + children.size() + " children @ " + modified + ')';
+      return path + " (" + childrenByName.size() + " children @ " + modified + ')';
     }
     
   }
