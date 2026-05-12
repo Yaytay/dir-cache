@@ -172,6 +172,14 @@
             <goals>
               <goal>display-plugin-updates</goal>
             </goals>
+            <configuration>
+              <ruleSet>
+                <ignoreVersion>
+                  <type>regex</type>
+                  <version>(.+-RC\d+|.+-M\d+|.+-beta-?\d+)</version>
+                </ignoreVersion>
+              </ruleSet>
+            </configuration>
           </execution>      
           <execution>
             <id>display-dependency-updates</id>
@@ -179,6 +187,14 @@
             <goals>
               <goal>display-dependency-updates</goal>
             </goals>
+            <configuration>
+              <ruleSet>
+                <ignoreVersion>
+                  <type>regex</type>
+                  <version>(.+-RC\d+|.+-M\d+|.+-beta-?\d+)</version>
+                </ignoreVersion>
+              </ruleSet>
+            </configuration>
           </execution>      
         </executions>      
       </plugin>
@@ -307,7 +323,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>13.4.0</version>
+            <version>13.4.2</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -418,7 +434,7 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>12.2.1</version>
+        <version>12.2.2</version>
         <configuration>
           <failBuildOnCVSS>8</failBuildOnCVSS>
           <failOnError>false</failOnError>
