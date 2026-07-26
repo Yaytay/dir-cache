@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html","k":"18"},{"p":"uk.co.spudsoft.dircache.impl","l":"DirCacheImplTest"},{"p":"uk.co.spudsoft.dircache.impl","l":"DirCachePollingTest"},{"p":"uk.co.spudsoft.dircache","l":"DirectoryTest"},{"p":"uk.co.spudsoft.dircache","l":"FileTest"},{"p":"uk.co.spudsoft.dircache","l":"MapTest"}];updateSearchResults();
