@@ -3,149 +3,29 @@
     "scanInfo": {
         "engineVersion": "13.0.0",
         "dataSource": [
+{
+                "name": "NVD API Last Checked",
+                "timestamp": "2026-11-18T15:59:27Z"
+            }
+,{
+                "name": "NVD API Last Modified",
+                "timestamp": "2026-11-18T10:00:13-05"
+            }
+,{
+                "name": "NVD Cache Last Checked",
+                "timestamp": "2026-11-18T15:59:27Z"
+            }
+,{
+                "name": "NVD Cache Last Modified",
+                "timestamp": "2026-11-18T10:00:13-05"
+            }
         ]
 
-            ,"analysisExceptions":[
-{            
-            
-            
-            "exception":{"message":"org.owasp.dependencycheck.data.update.exception.UpdateException: The execution of the download was interrupted"
-                ,"stackTrace":[
-"org.owasp.dependencycheck.data.update.NvdApiDataSource.processDownload(NvdApiDataSource.java:272)"
-,"org.owasp.dependencycheck.data.update.NvdApiDataSource.processDatafeed(NvdApiDataSource.java:161)"
-,"org.owasp.dependencycheck.data.update.NvdApiDataSource.update(NvdApiDataSource.java:126)"
-,"org.owasp.dependencycheck.Engine.doUpdates(Engine.java:873)"
-,"org.owasp.dependencycheck.Engine.initializeAndUpdateDatabase(Engine.java:678)"
-,"org.owasp.dependencycheck.Engine.analyzeDependencies(Engine.java:605)"
-,"org.owasp.dependencycheck.maven.BaseDependencyCheckMojo.runCheck(BaseDependencyCheckMojo.java:2072)"
-,"org.owasp.dependencycheck.maven.BaseDependencyCheckMojo.generate(BaseDependencyCheckMojo.java:1320)"
-,"org.apache.maven.plugins.site.render.ReportDocumentRenderer.renderDocument(ReportDocumentRenderer.java:196)"
-,"org.apache.maven.doxia.siterenderer.DefaultSiteRenderer.render(DefaultSiteRenderer.java:395)"
-,"org.apache.maven.plugins.site.render.SiteMojo.renderNonDoxiaDocuments(SiteMojo.java:299)"
-,"org.apache.maven.plugins.site.render.SiteMojo.renderLocale(SiteMojo.java:164)"
-,"org.apache.maven.plugins.site.render.SiteMojo.execute(SiteMojo.java:125)"
-,"org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:342)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:330)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:213)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:175)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:76)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:163)"
-,"org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:160)"
-,"org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)"
-,"org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)"
-,"org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)"
-,"org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)"
-,"org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)"
-,"org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)"
-,"org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)"
-,"org.apache.maven.cli.MavenCli.execute(MavenCli.java:910)"
-,"org.apache.maven.cli.MavenCli.doMain(MavenCli.java:283)"
-,"org.apache.maven.cli.MavenCli.main(MavenCli.java:206)"
-,"java.base\/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)"
-,"java.base\/java.lang.reflect.Method.invoke(Method.java:565)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:283)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:226)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:407)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:348)"
-                ]
-                ,            
-            
-            
-            "cause":{"message":"java.util.concurrent.ExecutionException: org.owasp.dependencycheck.utils.DownloadFailedException: Download failed, unable to copy 'https:\/\/nvd.nist.gov\/feeds\/json\/cve\/2.0\/nvdcve-2.0-2010.json.gz' to '\/tmp\/dctempfb93f536-949e-4879-b482-1c2fab47a12b\/nvd-datafeed-fe5a9af3-a090-4fa1-974f-9bc77751cf89.json.gz'; Premature end of Content-Length delimited message body (expected: 4359880; received: 3858819)"
-                ,"stackTrace":[
-"java.base\/java.util.concurrent.FutureTask.report(FutureTask.java:124)"
-,"java.base\/java.util.concurrent.FutureTask.get(FutureTask.java:193)"
-,"org.owasp.dependencycheck.data.update.NvdApiDataSource.processDownload(NvdApiDataSource.java:262)"
-,"org.owasp.dependencycheck.data.update.NvdApiDataSource.processDatafeed(NvdApiDataSource.java:161)"
-,"org.owasp.dependencycheck.data.update.NvdApiDataSource.update(NvdApiDataSource.java:126)"
-,"org.owasp.dependencycheck.Engine.doUpdates(Engine.java:873)"
-,"org.owasp.dependencycheck.Engine.initializeAndUpdateDatabase(Engine.java:678)"
-,"org.owasp.dependencycheck.Engine.analyzeDependencies(Engine.java:605)"
-,"org.owasp.dependencycheck.maven.BaseDependencyCheckMojo.runCheck(BaseDependencyCheckMojo.java:2072)"
-,"org.owasp.dependencycheck.maven.BaseDependencyCheckMojo.generate(BaseDependencyCheckMojo.java:1320)"
-,"org.apache.maven.plugins.site.render.ReportDocumentRenderer.renderDocument(ReportDocumentRenderer.java:196)"
-,"org.apache.maven.doxia.siterenderer.DefaultSiteRenderer.render(DefaultSiteRenderer.java:395)"
-,"org.apache.maven.plugins.site.render.SiteMojo.renderNonDoxiaDocuments(SiteMojo.java:299)"
-,"org.apache.maven.plugins.site.render.SiteMojo.renderLocale(SiteMojo.java:164)"
-,"org.apache.maven.plugins.site.render.SiteMojo.execute(SiteMojo.java:125)"
-,"org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:342)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:330)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:213)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:175)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:76)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:163)"
-,"org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)"
-,"org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:160)"
-,"org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)"
-,"org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)"
-,"org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)"
-,"org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)"
-,"org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)"
-,"org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)"
-,"org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)"
-,"org.apache.maven.cli.MavenCli.execute(MavenCli.java:910)"
-,"org.apache.maven.cli.MavenCli.doMain(MavenCli.java:283)"
-,"org.apache.maven.cli.MavenCli.main(MavenCli.java:206)"
-,"java.base\/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)"
-,"java.base\/java.lang.reflect.Method.invoke(Method.java:565)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:283)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:226)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:407)"
-,"org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:348)"
-                ]
-                ,            
-            
-            
-            "cause":{"message":"org.owasp.dependencycheck.utils.DownloadFailedException: Download failed, unable to copy 'https:\/\/nvd.nist.gov\/feeds\/json\/cve\/2.0\/nvdcve-2.0-2010.json.gz' to '\/tmp\/dctempfb93f536-949e-4879-b482-1c2fab47a12b\/nvd-datafeed-fe5a9af3-a090-4fa1-974f-9bc77751cf89.json.gz'; Premature end of Content-Length delimited message body (expected: 4359880; received: 3858819)"
-                ,"stackTrace":[
-"org.owasp.dependencycheck.utils.Downloader.fetchFile(Downloader.java:425)"
-,"org.owasp.dependencycheck.utils.Downloader.fetchFile(Downloader.java:467)"
-,"org.owasp.dependencycheck.data.update.nvd.api.DownloadTask.call(DownloadTask.java:88)"
-,"org.owasp.dependencycheck.data.update.nvd.api.DownloadTask.call(DownloadTask.java:39)"
-,"java.base\/java.util.concurrent.FutureTask.run(FutureTask.java:328)"
-,"java.base\/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)"
-,"java.base\/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)"
-,"java.base\/java.lang.Thread.run(Thread.java:1474)"
-                ]
-                ,            
-            
-            
-            "cause":{"message":"org.apache.hc.core5.http.ConnectionClosedException: Premature end of Content-Length delimited message body (expected: 4359880; received: 3858819)"
-                ,"stackTrace":[
-"org.apache.hc.core5.http.impl.io.ContentLengthInputStream.read(ContentLengthInputStream.java:178)"
-,"org.apache.hc.core5.http.io.EofSensorInputStream.read(EofSensorInputStream.java:138)"
-,"java.base\/java.nio.channels.Channels$ReadableByteChannelImpl.read(Channels.java:318)"
-,"org.owasp.dependencycheck.utils.SaveToFileResponseHandler.handleEntity(SaveToFileResponseHandler.java:50)"
-,"org.owasp.dependencycheck.utils.SaveToFileResponseHandler.handleEntity(SaveToFileResponseHandler.java:32)"
-,"org.apache.hc.client5.http.impl.classic.AbstractHttpClientResponseHandler.handleResponse(AbstractHttpClientResponseHandler.java:71)"
-,"org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:247)"
-,"org.apache.hc.client5.http.impl.classic.CloseableHttpClient.execute(CloseableHttpClient.java:188)"
-,"org.owasp.dependencycheck.utils.Downloader.fetchFile(Downloader.java:410)"
-,"org.owasp.dependencycheck.utils.Downloader.fetchFile(Downloader.java:467)"
-,"org.owasp.dependencycheck.data.update.nvd.api.DownloadTask.call(DownloadTask.java:88)"
-,"org.owasp.dependencycheck.data.update.nvd.api.DownloadTask.call(DownloadTask.java:39)"
-,"java.base\/java.util.concurrent.FutureTask.run(FutureTask.java:328)"
-,"java.base\/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1090)"
-,"java.base\/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:614)"
-,"java.base\/java.lang.Thread.run(Thread.java:1474)"
-                ]
-            }
-
-            }
-
-            }
-
-            }
-}
-            ]
 
     },
     "projectInfo": {
         "name": "Dir Cache",
-"groupID":"uk.co.spudsoft","artifactID":"dir-cache","version":"0.1.3",        "reportDate": "2026-10-03T04:33:23.705605247Z",
+"groupID":"uk.co.spudsoft","artifactID":"dir-cache","version":"0.1.4",        "reportDate": "2026-11-18T16:00:57.483021736Z",
         "credits": {
             "NVD": "This product uses the NVD API but is not endorsed or certified by the NVD. This report contains data retrieved from the National Vulnerability Database: https://nvd.nist.gov",
             "CISA": "This report may contain data retrieved from the CISA Known Exploited Vulnerability Catalog: https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
@@ -165,7 +45,7 @@
                 "Dir Cache:provided"
             ]
             ,"includedBy": [
-                { "reference":"pkg:maven\/uk.co.spudsoft\/dir-cache@0.1.3" }
+                { "reference":"pkg:maven\/uk.co.spudsoft\/dir-cache@0.1.4" }
             ]
             ,"evidenceCollected": {
                 "vendorEvidence": [
@@ -596,7 +476,7 @@
                 "Dir Cache:compile"
             ]
             ,"includedBy": [
-                { "reference":"pkg:maven\/uk.co.spudsoft\/dir-cache@0.1.3" }
+                { "reference":"pkg:maven\/uk.co.spudsoft\/dir-cache@0.1.4" }
             ]
             ,"evidenceCollected": {
                 "vendorEvidence": [
